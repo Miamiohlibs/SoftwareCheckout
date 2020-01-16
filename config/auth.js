@@ -20,28 +20,41 @@ const options = {
     grant_type: 'client_credentials'
   }
 }
-async function getToken(options, postData) {
-  const req = https.request(options, async (res) => {
-    console.log('statusCode:', res.statusCode);
-    console.log('headers:', res.headers);
 
-    const auth = res.on('data', (d) => {
-      process.stdout.write(d);
-      const auth = JSON.parse(d);
-      return auth;
-    });
+const getToken = () => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      // console.log(options.hostname);
+    }, 1000);
+    
+    resolve(options.hostname);
   });
-  req.on('error', (e) => {
-    console.error(e);
-  });
-
-  req.write(postData);
-  req.end();
-  return auth;
 }
 
-const auth = getToken(options, postData);
-module.exports = auth;
+module.exports = getToken;
+
+// async function getToken(options, postData) {
+//   const req = https.request(options, async (res) => {
+//     console.log('statusCode:', res.statusCode);
+//     console.log('headers:', res.headers);
+
+//     const auth = res.on('data', (d) => {
+//       process.stdout.write(d);
+//       const auth = JSON.parse(d);
+//       return auth;
+//     });
+//   });
+//   req.on('error', (e) => {
+//     console.error(e);
+//   });
+
+//   req.write(postData);
+//   req.end();
+//   return auth;
+// }
+
+// const auth = getToken(options, postData);
+// module.exports = auth;
 
 /*
 const ClientPasswordStrategy = require('passport-oauth2-client-password').Strategy;

@@ -1,9 +1,9 @@
 const express = require('express');
 // const passport = require('passport');
 const app = express();
-const token = require('./config/auth');
-console.log('Recieved token: ', token);
-/*
+//const token = require('./config/auth');
+//console.log('Recieved token: ', token);
+
 const credentials = {
   client: {
     id: '230',
@@ -41,7 +41,7 @@ const httpOptions = {
 app.get('/callback', async (req,res) => {
   const options = { }
   try {
-    const result = await oauth2.authorizationCode.getToken(tokenConfig, httpOptions);
+    const result = await oauth2.authorizationCode.getToken();
     const accessToken = oauth2.accessToken.create(result);
     console.log('Token: ', result);
   
@@ -50,7 +50,7 @@ app.get('/callback', async (req,res) => {
   }
   
 })
-*/
+
 
 
 
