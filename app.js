@@ -8,9 +8,10 @@ query(campusOptions.connectConfig).then(values => {
   campusToken = JSON.parse(values);
 });
 
-// // Get the LibCal API Token
-// const { oauth2, getToken, libCalOpts } = require('./config/auth');
+// Get the LibCal API Token
+const { oauth2, getToken, libCalOptions } = require('./config/auth');
 
+console.log(libCalOptions)
 // // With Token, make API calls
 // getToken().then(values => {
 //   const token = values.access_token;
