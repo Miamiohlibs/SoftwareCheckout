@@ -28,5 +28,8 @@ module.exports = {
       cid: 15707,
       name: 'Adobe Photoshop'
     }
+  },
+  httpsOptions: {
+    hostname: 'muohio.libcal.com'
   }
 }
