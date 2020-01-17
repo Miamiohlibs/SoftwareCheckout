@@ -40,7 +40,24 @@ getToken().then(values => {
 
   Promise.all([promises['bookings'], promises['locations'], promises['overdue'], promises['categories']]).then((values) => {
     // const cats = JSON.parse(values[libcalQueries.indexOf('categories')])[0].categories;
+    var userlists = [];
+    const bookings =  JSON.parse(values[libcalQueries.indexOf('bookings')]);
 
+    // build an array of object, one per category ID (category ID = kind of software (photoshop,illustrator, etc))
+    bookings.forEach((entry) => {
+      //console.log(entry.cid + ' : ' +entry.email)
+      var cid = entry.cid;
+      if (! userlists[cid]) { userlists[cid] = []; }
+      if (entry.email.includes('@miamioh.edu') || entry.email.includes('@muohio.edu')) {
+        userlists[cid].push(emaientry.email);
+      } else { 
+        console.log('REJECTED NON-MIAMI ADDRESS: ',entry.email)
+      }
+
+    })
+    //console.log(bookings)
+    const ps_id = libCalOptions.software.photoshop.cid;
+    console.log ('Photoshop: ', userlists[ps_id])
   })
 })
 
