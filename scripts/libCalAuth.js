@@ -1,4 +1,4 @@
-const libCal = require('./libCal');
+const libCal = require('../config/libCal');
 const oauth2 = require('simple-oauth2').create(libCal.credentials);
 
 module.exports = {
