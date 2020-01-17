@@ -1,0 +1,23 @@
+List group members:
+curl -X GET \
+  https://community.miamioh.edu/directory-accounts/api/members/:groupName \
+  -H 'Accept: application/json' \
+  -H 'Authorization: sekret'
+
+
+Add group member:
+curl -X POST \
+  https://community.miamioh.edu/directory-accounts/api/members/:groupName \
+  -H 'Accept: application/json' \
+  -H 'Authorization: sekret' \
+  -H 'Content-Type: application/json' \
+  -d '{
+        "uniqueId": "publicjq"
+    }'
+
+Remove group member:
+curl -X DELETE \
+  https://community.miamioh.edu/directory-accounts/api/members/:groupName/:uid \
+  -H 'Accept: application/json' \
+  -H 'Authorization: sekret' \
+  -H 'Content-Type: application/json'
