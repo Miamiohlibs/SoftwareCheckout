@@ -1,5 +1,4 @@
 const express = require('express');
-// const passport = require('passport');
 const app = express();
 //const token = require('./config/auth');
 //console.log('Recieved token: ', token);
@@ -19,6 +18,7 @@ const credentials = {
     authorizePath: '/1.1/oauth/token'
   },
   http: {
+    json: 'force',
     headers: {
       grant_type: 'client_credentials',
     }
@@ -41,7 +41,7 @@ const httpOptions = {
 app.get('/callback', async (req,res) => {
   const options = { }
   try {
-    const result = await oauth2.authorizationCode.getToken();
+    const result = await oauth2.clientCredentials.getToken();
     const accessToken = oauth2.accessToken.create(result);
     console.log('Token: ', result);
   
