@@ -29,7 +29,15 @@ module.exports = {
       name: 'Adobe Photoshop'
     }
   },
-  httpsOptions: {
-    hostname: 'muohio.libcal.com'
+  queryConfig: {
+    options: {
+      hostname: 'muohio.libcal.com',
+      port: 443,
+      path: '', //set at query time
+      method: 'GET',
+      headers: {
+        // set at query time
+      }
+    },
   }
 }
