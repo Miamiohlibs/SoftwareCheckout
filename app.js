@@ -1,7 +1,13 @@
 const fs = require('fs');
 const path = require('path');
+const getCampusToken = require('./config/campusIT');
 
-// Get the API Token
+// Get the Campus IT Token
+getCampusToken().then(values => {
+  campusToken = JSON.parse(values);
+});
+
+// Get the LibCal API Token
 const { oauth2, getToken, software  } = require('./config/auth');
 
 // With Token, make API calls
