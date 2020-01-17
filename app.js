@@ -1,58 +1,29 @@
-const express = require('express');
-const app = express();
 //const token = require('./config/auth');
 //console.log('Recieved token: ', token);
 
-const credentials = {
-  client: {
-    id: '230',
-    secret: '2a776c14a7bf130b46295f4ac41173cb',
-    secretParamName: 'client_secret',
-    idParamName: 'client_id'
-  },
-  auth: {
-    tokenHost: 'https://muohio.libcal.com',
-    tokenPath: '/1.1/oauth/token',
-    revokePath: '/1.1/oauth/revoke',
-    authorizeHost: 'https://muohio.libcal.com',
-    authorizePath: '/1.1/oauth/token'
-  },
-  http: {
-    json: 'force',
-    headers: {
-      grant_type: 'client_credentials',
+const libCal = require('./config/libCal');
+const oauth2 = require('simple-oauth2').create(libCal.credentials);
+
+const token = new Promise((resolve, revoke) => {
+  async function getToken() {
+    try {
+      const result = await oauth2.clientCredentials.getToken();
+      const accessToken = oauth2.accessToken.create(result);
+      //console.log('Token: ', result);
+      resolve(result);
+
+    } catch (err) {
+      console.error('Access Token Error', err.message);
     }
-  },
-  options: {
-    bodyFormat: 'form'
   }
-}
+  getToken();
+});
 
-const oauth2 = require('simple-oauth2').create(credentials);
-
-const tokenConfig = {
-
-};
-const httpOptions = {
-  headers: {
-    grant_type: 'client_credentials',
-  }
-}
-app.get('/callback', async (req,res) => {
-  const options = { }
-  try {
-    const result = await oauth2.clientCredentials.getToken();
-    const accessToken = oauth2.accessToken.create(result);
-    console.log('Token: ', result);
-  
-  } catch (err) {
-    console.error('Access Token Error', err.message);
-  }
-  
-})
+Promise.all([token]).then(values => console.log(values))
 
 
 
 
-const PORT = process.env.PORT || 1000;
-app.listen(PORT, () => console.log(`Software Checkout started on port ${PORT}`));
+
+
+
