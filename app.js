@@ -1,4 +1,5 @@
 const fs = require('fs');
+const path = require('path');
 
 // Get the API Token
 const { oauth2, getToken, software  } = require('./config/auth');
@@ -14,7 +15,7 @@ getToken().then(values => {
     if (element == 'categories') { var id = '/8370'} else { id = ''}
     promises[element] = new Promise((resolve, reject) => {
       var query = require('./config/apiQuery')({ path: '/1.1/equipment/' + element + id, token: token }).then((result) => {
-        fs.writeFile(element + '.log', result, (err) => {
+        fs.writeFile(path.join(__dirname,'logs',element + '.log'), result, (err) => {
           console.log('Wrote new data to ' + element + '.log');
           resolve(result);
         });
