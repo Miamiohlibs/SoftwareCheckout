@@ -11,43 +11,38 @@ query(campusOptions.connectConfig).then(values => {
 // Get the LibCal API Token
 const { oauth2, getToken, libCalOptions } = require('./scripts/libCalAuth');
 
-console.log(libCalOptions)
-// // With Token, make API calls
-// getToken().then(values => {
-//   const token = values.access_token;
+// With Token, make API calls
+getToken().then(values => {
+  const libCalToken = values.access_token;
+  libcalQueries = ['bookings', 'locations', 'overdue', 'categories'];
+  var promises = [];
 
-//   libcalQueries = ['bookings', 'locations', 'overdue', 'categories'];
-//   var promises = [];
+  libcalQueries.forEach(element => {
+    // only get category 8370: library software 
+    if (element == 'categories') { var id = '/8370' } else { id = '' }
 
-//   libcalQueries.forEach(element => {
-//     // only get category 8370: library software 
-//     if (element == 'categories') { var id = '/8370' } else { id = '' }
+    libCalOptions.queryConfig.options.path = '/1.1/equipment/' + element;
+    libCalOptions.queryConfig.options.headers = { Authorization: 'Bearer ' + libCalToken }
+    // get a promise for each call
+    promises[element] = new Promise((resolve, reject) => {
+      // execute an API call
+      //console.log(libCalOptions.queryConfig.options)
+      var query = require('./scripts/httpQuery')(libCalOptions.queryConfig)
+        .then((result) => {
+          fs.writeFile(path.join(__dirname, 'logs', element + '.log'), result, (err) => {
+            console.log('Wrote new data to ' + element + '.log');
+            resolve(result);
+          });
+        })
+        .catch('Failed to retrieve ' + element)
+    })
+  });
 
-//     // get a promise for each call
-//     promises[element] = new Promise((resolve, reject) => {
-//       // execute an API call
-//       var query = require('./config/apiQuery')(
-//         {
-//           path: '/1.1/equipment/' + element + id,
-//           token: token,
-//           hostname: libCalOpts.httpsOptions.hostname,
-//           method: 'GET'
-//         })
-//         .then((result) => {
-//           fs.writeFile(path.join(__dirname, 'logs', element + '.log'), result, (err) => {
-//             console.log('Wrote new data to ' + element + '.log');
-//             resolve(result);
-//           });
-//         })
-//         .catch('Failed to retrieve ' + element)
-//     })
-//   });
+  Promise.all([promises['bookings'], promises['locations'], promises['overdue'], promises['categories']]).then((values) => {
+    // const cats = JSON.parse(values[libcalQueries.indexOf('categories')])[0].categories;
 
-//   Promise.all([promises['bookings'], promises['locations'], promises['overdue'], promises['categories']]).then((values) => {
-//     // const cats = JSON.parse(values[libcalQueries.indexOf('categories')])[0].categories;
-
-//   })
-// })
+  })
+})
 
 
 
