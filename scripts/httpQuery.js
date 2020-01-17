@@ -2,16 +2,7 @@ const https = require('https');
 
 module.exports = function (queryOptions) {
   return new Promise((resolve, reject) => {
-    const options = {
-      hostname: queryOptions.hostname, 
-      port: 443,
-      path: queryOptions.path,
-      method: queryOptions.method,
-      headers: {
-        Authorization: 'Bearer ' + queryOptions.token
-      }
-    }
-    let query = doQuery(options, queryOptions.data);
+    let query = doQuery(queryOptions.options, queryOptions.data);
     resolve(query);
   })
 }
@@ -41,7 +32,7 @@ function doRequest(options, data) {
       reject(err);
     });
 
-    if (data !== undefined) { req.write(data); } 
+    if (data !== undefined) { req.write(JSON.stringify(data)); } 
     req.end();
 
 

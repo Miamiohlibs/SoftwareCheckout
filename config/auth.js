@@ -18,5 +18,6 @@ module.exports = {
       }
       getLibCalToken();
     });
-  }
+  },
+  libCalOpts: libCal
 }
