@@ -22,5 +22,11 @@ module.exports = {
     options: {
       bodyFormat: 'form'
     }
+  },
+  software: {
+    photoshop: {
+      cid: 15707,
+      name: 'Adobe Photoshop'
+    }
   }
 }
