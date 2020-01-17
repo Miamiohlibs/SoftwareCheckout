@@ -4,22 +4,27 @@
 const libCal = require('./config/libCal');
 const oauth2 = require('simple-oauth2').create(libCal.credentials);
 
-const token = new Promise((resolve, revoke) => {
-  async function getToken() {
-    try {
-      const result = await oauth2.clientCredentials.getToken();
-      const accessToken = oauth2.accessToken.create(result);
-      //console.log('Token: ', result);
-      resolve(result);
+function getToken() {
+  return new Promise((resolve, revoke) => {
+    async function getLibCalToken() {
+      try {
+        const result = await oauth2.clientCredentials.getToken();
+        const accessToken = oauth2.accessToken.create(result);
+        //console.log('Token: ', result);
+        resolve(result);
 
-    } catch (err) {
-      console.error('Access Token Error', err.message);
+      } catch (err) {
+        console.error('Access Token Error', err.message);
+      }
     }
-  }
-  getToken();
-});
+    getLibCalToken();
+  });
+}
 
-Promise.all([token]).then(values => console.log(values))
+getToken().then(values => {
+  console.log('got token:')
+  console.log(values)
+})
 
 
 
