@@ -26,7 +26,8 @@ module.exports = {
   software: {
     photoshop: {
       cid: 15707,
-      name: 'Adobe Photoshop'
+      name: 'Adobe Photoshop',
+      groupName: 'dulb-patronphotoshop'
     }
   },
   queryConfig: {
