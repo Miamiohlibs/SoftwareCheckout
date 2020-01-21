@@ -49,7 +49,7 @@ getToken().then(values => {
       var cid = entry.cid;
       if (! userlists[cid]) { userlists[cid] = []; }
       if (entry.email.includes('@miamioh.edu') || entry.email.includes('@muohio.edu')) {
-        userlists[cid].push(emaientry.email);
+        userlists[cid].push(entry.email);
       } else { 
         console.log('REJECTED NON-MIAMI ADDRESS: ',entry.email)
       }
