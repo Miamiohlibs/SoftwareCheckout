@@ -23,11 +23,8 @@ module.exports = {
       path: '/directory-accounts/api/members/',
       method: 'GET',
       headers: {
-        'Content-Type': 'application/json'
+        'Accept': 'application/json'
       }
-    },
-    data: {
-
     }
   }
 }
