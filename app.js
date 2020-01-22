@@ -7,11 +7,11 @@ const leftOnly = require('./scripts/leftOnly');
 // Get the Campus IT Token
 query(campusOptions.connectConfig).then(values => {
   campusToken = JSON.parse(values);
-  console.log('CampusIT token: ', campusToken);
+  // console.log('CampusIT token: ', campusToken);
   campusOptions.queryConfig.get.options.headers.Authorization = campusToken.data.token;
   campusOptions.queryConfig.get.options.path += 'dulb-patronphotoshop';
 
-
+  campusLists = [];
   // Get lists of users:
   var ps_promise = new Promise((resolve, reject) => {
     // console.log('PASSING THESE OPTIONS TO HTTPQUERY:')
@@ -19,8 +19,12 @@ query(campusOptions.connectConfig).then(values => {
     // console.log('---END OPTIONS---');
     var query = require('./scripts/httpQuery')(campusOptions.queryConfig.get)
     .then((result) => {
-      console.log('Results of Photoshop request from campus IT:');
-      console.log(result);
+      campusLists['Photoshop'] = [];
+      JSON.parse(result).forEach((entry) => {
+        campusLists['Photoshop'].push(entry.uniqueId);
+        // console.log(entry.uniqueId)
+      })
+      console.log('Campus Photoshop Checkouts: ',campusLists['Photoshop']);
     })
     .catch((error) => {
       console.error('Failed to get photoshop license list from campus IT');
