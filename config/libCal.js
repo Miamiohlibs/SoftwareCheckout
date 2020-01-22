@@ -25,7 +25,7 @@ module.exports = {
   },
   software: {
     photoshop: {
-      cid: 15707,
+      cid: 15705,
       name: 'Adobe Photoshop',
       groupName: 'dulb-patronphotoshop'
     }

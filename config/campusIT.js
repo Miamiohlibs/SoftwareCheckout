@@ -17,13 +17,15 @@ module.exports = {
     }
   },
   queryConfig: {
-    getOptions: {
-      hostname: 'community.miamioh.edu',
-      port: 443,
-      path: '/directory-accounts/api/members/',
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json'
+    get: {
+      options: {
+        hostname: 'community.miamioh.edu',
+        port: 443,
+        path: '/directory-accounts/api/members/',
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json'
+        }
       }
     }
   }
