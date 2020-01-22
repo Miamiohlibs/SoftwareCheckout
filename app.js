@@ -7,7 +7,7 @@ const campusOptions = require('./config/campusIT');
 query(campusOptions.connectConfig).then(values => {
   campusToken = JSON.parse(values);
   console.log('CampusIT token: ', campusToken);
-  campusOptions.queryConfig.getOptions.headers.Authorization = 'Bearer ' + campusToken.data.token;
+  campusOptions.queryConfig.getOptions.headers.Authorization = campusToken.data.token;
   campusOptions.queryConfig.getOptions.path += 'dulb-patronphotoshop';
   console.log(campusOptions.queryConfig.getOptions)
   // Get lists of users:
