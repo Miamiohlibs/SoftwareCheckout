@@ -4,53 +4,83 @@ const query = require('./scripts/httpQuery');
 const campusOptions = require('./config/campusIT');
 const leftOnly = require('./scripts/leftOnly');
 
+/* campus functions */
+
+function sanitizeCampusList(json) {
+  emails = [];
+  json.forEach(entry => {
+    emails.push(entry.uniqueId);
+  });
+  return emails;
+}
+
+async function getCampusList () {
+  let campusListValues = await query(campusOptions.queryConfig.get).then(listValues => {
+    //console.log('Photoshop query: ', listValues)
+    return JSON.parse(listValues);
+   });
+   return sanitizeCampusList(campusListValues);
+}
+
 let campusPromises = new Promise((resolve, reject) => {
   // Get the Campus IT Token
-  query(campusOptions.connectConfig).then(values => {
+  query(campusOptions.connectConfig).then(values => { // Query returns is a Promise too
+    campusLists = [];
     campusToken = JSON.parse(values);
-    // console.log('CampusIT token: ', campusToken);
     campusOptions.queryConfig.get.options.headers.Authorization = campusToken.data.token;
     campusOptions.queryConfig.get.options.path += 'dulb-patronphotoshop';
-
-    // With Campus token, get permissions lists for each software group
-    campusLists = [];
-    // Get lists of users:
-    var campus_ps_promise = new Promise((resolve, reject) => {
-      var query = require('./scripts/httpQuery')(campusOptions.queryConfig.get)
-        .then((result) => {
-          campusLists['Photoshop'] = [];
-          JSON.parse(result).forEach((entry) => {
-            campusLists['Photoshop'].push(entry.uniqueId);
-            // console.log(entry.uniqueId)
-          })
-          console.log('Campus Photoshop Checkouts: ', campusLists['Photoshop']);
-          resolve(campusLists);
-        })
-        .catch((error) => {
-          console.error('Failed to get photoshop license list from campus IT');
-          console.error(error);
-          reject(error);
-        })
-    }).then((campusResults) => {
-      console.log('Penultimate layer: ',campusResults)
-      resolve(campusResults);
-    });
-
-  }).then((x) => {
-    console.log("Last layer:", x)
-    resolve(x);
+    campusLists = getCampusList();
+    resolve(campusLists); // this returns a value to campusPromises
   });
 });
 
-let libCalPromises = new Promise((resolve, reject) => {
-  resolve('jelly');
-})
 
-Promise.all([campusPromises, libCalPromises]).then((values) => {
-  console.log(values);
-}).catch((error) => {
-  console.error(error)
-})
+
+
+
+  // let campusPromises = new Promise((resolve, reject) => {
+  //   // Get the Campus IT Token
+  //   query(campusOptions.connectConfig).then(values => {
+  //     campusToken = JSON.parse(values);
+  //     // console.log('CampusIT token: ', campusToken);
+  //     campusOptions.queryConfig.get.options.headers.Authorization = campusToken.data.token;
+  //     campusOptions.queryConfig.get.options.path += 'dulb-patronphotoshop';
+
+  //     // With Campus token, get permissions lists for each software group
+  //     campusLists = [];
+  //     // Get lists of users:
+  //     let campus_ps_promise = new Promise((resolve, reject) => {
+  //       let listQuery = query(campusOptions.connectConfig).then(values => {
+  //         .then((result) => {
+  //           campusLists['Photoshop'] = [];
+  //           JSON.parse(result).forEach((entry) => {
+  //             campusLists['Photoshop'].push(entry.uniqueId);
+  //             // console.log(entry.uniqueId)
+  //           })
+  //           console.log('Campus Photoshop Checkouts: ', campusLists['Photoshop']);
+  //           resolve(campusLists);
+  //         })
+  //         .catch((error) => {
+  //           console.error('Failed to get photoshop license list from campus IT');
+  //           console.error(error);
+  //           reject(error);
+  //         });
+  //     }).then((campusResults) => {
+  //       console.log('Penultimate layer: ',campusResults)
+  //       resolve(campusResults);
+  //     })
+  //   })
+  // });
+
+  let libCalPromises = new Promise((resolve, reject) => {
+    resolve('jelly');
+  })
+
+  Promise.all([campusPromises, libCalPromises]).then((values) => {
+    console.log(values);
+  }).catch((error) => {
+    console.error(error)
+  })
 
 
 
