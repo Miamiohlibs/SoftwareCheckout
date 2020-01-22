@@ -14,7 +14,7 @@ async function doQuery(options, data) {
 function doRequest(options, data) {
   return new Promise((resolve, reject) => {
 
-    //console.log('doRequest options: ', options)
+    console.log('doRequest options: ', options)
     const req = https.request(options, (res) => {
       res.setEncoding('utf8');
       let responseBody = '';
