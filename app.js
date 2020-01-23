@@ -6,20 +6,20 @@ const leftOnly = require('./scripts/leftOnly');
 
 /* campus functions */
 
-function sanitizeCampusList(json) {
-  emails = [];
+function justUniqueIds(json) {
+  ids = [];
   json.forEach(entry => {
-    emails.push(entry.uniqueId);
+    ids.push(entry.uniqueId);
   });
-  return emails;
+  return ids;
 }
 
-async function getCampusList () {
+async function getCampusList() {
   let campusListValues = await query(campusOptions.queryConfig.get).then(listValues => {
     //console.log('Photoshop query: ', listValues)
     return JSON.parse(listValues);
-   });
-   return sanitizeCampusList(campusListValues);
+  });
+  return justUniqueIds(campusListValues);
 }
 
 let campusPromises = new Promise((resolve, reject) => {
@@ -35,52 +35,68 @@ let campusPromises = new Promise((resolve, reject) => {
 });
 
 
+/* LibCal functions */
+
+async function getOneLibCalList(element, token, libCalOptions) {
+  // only get category 8370: library software 
+  if (element == 'categories') { var id = '/8370' } else { id = '' }
+
+  libCalOptions.queryConfig.options.path = '/1.1/equipment/' + element + id;
+  libCalOptions.queryConfig.options.headers = { Authorization: 'Bearer ' + token }
+  // get a promise for each call
+
+  promise = await query(libCalOptions.queryConfig).then((response) => {
+    return (response);
+  });
+
+  return promise;
+}
+
+function getLibCalLists(myToken, myLibCalOptions) {
+  const token = myToken;
+  const libCalOptions = myLibCalOptions;
+  libcalQueries = ['bookings', 'locations', 'overdue', 'categories'];
+  promises = [];
+
+  libcalQueries.forEach((element) => {
+    promises[element] = getOneLibCalList(element, token, libCalOptions);
+  });
+
+  console.log(promises)
+  return promises;
+} //end fn getLibCalLists
 
 
+    // promises[element] = new Promise((resolve, reject) => {
+    //   // execute an API call
+    //   console.log(libCalOptions.queryConfig.options)
+    //   var query = require('./scripts/httpQuery')(libCalOptions.queryConfig)
+    //     .then((result) => {
+    //       fs.writeFile(path.join(__dirname, 'logs', element + '.log'), result, (err) => {
+    //         console.log('Wrote new data to ' + element + '.log');
+    //         resolve(result);
+    //       });
+    //     })
+    //     .catch('Failed to retrieve ' + element)
+    // })
 
-  // let campusPromises = new Promise((resolve, reject) => {
-  //   // Get the Campus IT Token
-  //   query(campusOptions.connectConfig).then(values => {
-  //     campusToken = JSON.parse(values);
-  //     // console.log('CampusIT token: ', campusToken);
-  //     campusOptions.queryConfig.get.options.headers.Authorization = campusToken.data.token;
-  //     campusOptions.queryConfig.get.options.path += 'dulb-patronphotoshop';
+let libCalPromises = new Promise((resolve, reject) => {
+  const { oauth2, getToken, libCalOptions } = require('./scripts/libCalAuth');
 
-  //     // With Campus token, get permissions lists for each software group
-  //     campusLists = [];
-  //     // Get lists of users:
-  //     let campus_ps_promise = new Promise((resolve, reject) => {
-  //       let listQuery = query(campusOptions.connectConfig).then(values => {
-  //         .then((result) => {
-  //           campusLists['Photoshop'] = [];
-  //           JSON.parse(result).forEach((entry) => {
-  //             campusLists['Photoshop'].push(entry.uniqueId);
-  //             // console.log(entry.uniqueId)
-  //           })
-  //           console.log('Campus Photoshop Checkouts: ', campusLists['Photoshop']);
-  //           resolve(campusLists);
-  //         })
-  //         .catch((error) => {
-  //           console.error('Failed to get photoshop license list from campus IT');
-  //           console.error(error);
-  //           reject(error);
-  //         });
-  //     }).then((campusResults) => {
-  //       console.log('Penultimate layer: ',campusResults)
-  //       resolve(campusResults);
-  //     })
-  //   })
-  // });
-
-  let libCalPromises = new Promise((resolve, reject) => {
-    resolve('jelly');
+  // With Token, make API calls
+  getToken().then(values => {
+    const libCalToken = values.access_token;
+    libCalLists = getLibCalLists(libCalToken, libCalOptions);
+    resolve(libCalLists);
   })
+})
 
-  Promise.all([campusPromises, libCalPromises]).then((values) => {
-    console.log(values);
-  }).catch((error) => {
-    console.error(error)
-  })
+
+Promise.all([campusPromises, libCalPromises]).then((values) => {
+  console.log(values);
+}).catch((error) => {
+  console.error(error)
+})
 
 
 
