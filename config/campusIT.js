@@ -37,7 +37,32 @@ module.exports = {
           'Accept': 'application/json'
         }
       }
+    },
+    post: {
+      options: {
+        hostname: 'community.miamioh.edu',
+        port: 443,
+        pathStem: '/directory-accounts/api/members/',
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
+      }
+    },
+    delete: {
+      options: {
+        hostname: 'community.miamioh.edu',
+        port: 443,
+        pathStem: '/directory-accounts/api/members/',
+        method: 'DELETE',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
+      }
     }
   }
+  
 }
 
