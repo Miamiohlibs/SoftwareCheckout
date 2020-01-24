@@ -13,7 +13,7 @@ let campusPromises = new Promise((resolve, reject) => {
     campusOptions.queryConfig.get.options.headers.Authorization = campusToken.data.token;
     campusLists = getCampusLists();
     Promise.all([campusLists.photoshop, campusLists.illustrator]).then(values => {
-      console.log('NOW: ',typeof values[0])
+      // console.log('NOW: ',typeof values[0])
       // resolve( { photoshop: JSON.parse(values[0]), illustrator: JSON.parse(values[1]) })
       resolve( { photoshop: (values[0]), illustrator: (values[1]) })
     })
@@ -60,9 +60,10 @@ Promise.all([campusPromises, libCalPromises]).then((values) => {
     bookings[element.campuscode] = libcal.bookings.filter(obj => { return obj.cid === element.cid }).map(obj => { return obj.email.substring(0, obj.email.indexOf('@')) });
   });
   campusOptions.software.forEach(item => {
-    console.log(item.name, '(LibCal):', bookings[item.shortName]);
-    console.log(item.name, '(Campus):', campus[item.shortName]);
+    // console.log(item.name, '(LibCal):', bookings[item.shortName]);
+    // console.log(item.name, '(Campus):', campus[item.shortName]);
   });
+  UpdateGroupMembers(bookings, campus);
   // let photoshop_bookings = libcal.bookings.filter(obj => {return obj.cid === 15705}).map(obj => { return obj.email.substring(0,obj.email.indexOf('@')) });
   // let illustrator_bookings = libcal.bookings.filter(obj => { return obj.cid === 15809 }).map(obj => { return obj.email });;
   /* can we subsequently filter by between-dates? */
@@ -77,6 +78,53 @@ Promise.all([campusPromises, libCalPromises]).then((values) => {
 
 // /* Campus functions */
 
+function UpdateGroupMembers(bookings, campus) {
+  campusOptions.software.forEach(item => {
+    // console.log(item.shortName,campus[item.shortName]);
+    console.log('UPDATE',item.name)
+    idsToDelete = leftOnly(campus[item.shortName], bookings[item.shortName]);
+    idsToAdd = leftOnly(bookings[item.shortName], campus[item.shortName]);
+    console.log('ADD:',idsToAdd);
+    console.log('DELETE:',idsToDelete);
+    campusAdditions(item.shortName, idsToAdd);
+    campusDeletions(item.shortName, idsToDelete);
+  });
+}
+
+async function oneCampusUpdate(config) {
+  // console.log(config)
+  return await query(config);
+}
+
+function campusAdditions (software, adds) {
+  promises = []
+  adds.forEach(id => {
+    // campusOptions.queryConfig.post = campusOptions.queryConfig.get;
+    campusOptions.queryConfig.post.options.path = campusOptions.queryConfig.post.options.pathStem + 'dulb-patron' + software;
+    // campusOptions.queryConfig.post.options.method = 'POST';
+    campusOptions.queryConfig.post.data = {uniqueId: id}
+    promises[id] = oneCampusUpdate(campusOptions.queryConfig.post);
+  })
+
+    Promise.all(promises).then(values => {
+      console.log(software,'additions complete');
+    });
+
+}
+
+function campusDeletions (software, deletes) {
+  promises = []
+  deletes.forEach(id => {
+    // campusOptions.queryConfig.post = campusOptions.queryConfig.get;
+    campusOptions.queryConfig.delete.options.path = campusOptions.queryConfig.delete.options.pathStem + 'dulb-patron' + software + '/' + id;
+    campusOptions.queryConfig.delete.options.headers.Authorization = campusOptions.queryConfig.get.options.headers.Authorization
+    promises[id] = oneCampusUpdate(campusOptions.queryConfig.delete);
+  })
+    Promise.all(promises).then(values => {
+      console.log(software,'deletions complete');
+    });
+
+}
 // takes an array of campus user info from the API and just returns a list of uniqueIds from the uniqueId field
 function justUniqueIds(json) {
   ids = [];
@@ -88,6 +136,7 @@ function justUniqueIds(json) {
 
 async function getOneCampusList(software) {
   let response = await query(campusOptions.queryConfig.get);
+  // console.log(response)
   return justUniqueIds(JSON.parse(response));
 }
 
