@@ -7,17 +7,19 @@ const leftOnly = require('./scripts/leftOnly');
 // Initiate Campus Requests
 let campusPromises = new Promise((resolve, reject) => {
   // Get the Campus IT Token
+  // console.log(campusOptions.connectConfig);
   query(campusOptions.connectConfig).then(values => { // Query returns is a Promise too
-    campusLists = [];
     campusToken = JSON.parse(values);
     campusOptions.queryConfig.get.options.headers.Authorization = campusToken.data.token;
-    campusOptions.queryConfig.get.options.path += 'dulb-patronphotoshop';
-    campusLists = getCampusList();
-    resolve(campusLists); // this returns a value to campusPromises
-  })
-    .catch((error) => {
-      console.error('Failed to get Campus info: ', error)
-    });
+    campusLists = getCampusLists();
+    Promise.all([campusLists.photoshop, campusLists.illustrator]).then(values => {
+ //     resolve( { photoshop: values[0], illustrator: values[1] })
+  console.log(values)
+    })
+      .catch((error) => {
+        console.error('Failed to get Campus info: ', error)
+      });
+  });
 });
 
 // Initiate LibCal Requests
@@ -66,8 +68,9 @@ Promise.all([campusPromises, libCalPromises]).then((values) => {
   console.error(error)
 })
 
-/* Campus functions */
+// /* Campus functions */
 
+// takes an array of campus user info from the API and just returns a list of uniqueIds from the uniqueId field
 function justUniqueIds(json) {
   ids = [];
   json.forEach(entry => {
@@ -76,12 +79,18 @@ function justUniqueIds(json) {
   return ids;
 }
 
-async function getCampusList() {
-  let campusListValues = await query(campusOptions.queryConfig.get).then(listValues => {
-    //console.log('Photoshop query: ', listValues)
-    return JSON.parse(listValues);
+async function getOneCampusList(software) {
+  return await query(campusOptions.queryConfig.get);
+}
+
+function getCampusLists() {
+  const software = ['photoshop','illustrator'];
+  promises = [];
+  software.forEach(element => {
+    campusOptions.queryConfig.get.options.path = campusOptions.queryConfig.get.options.pathStem + 'dulb-patron' +element;
+    promises[element] = getOneCampusList(element);
   });
-  return justUniqueIds(campusListValues);
+  return promises;
 }
 /* end Campus function */
 
@@ -115,66 +124,3 @@ function getLibCalLists(myToken, myLibCalOptions) {
   // console.log(promises)
   return promises;
 } //end fn getLibCalLists
-
-/* end LibCal function */
-
-
-// // Get the LibCal API Token
-// const { oauth2, getToken, libCalOptions } = require('./scripts/libCalAuth');
-
-// // With Token, make API calls
-// getToken().then(values => {
-//   const libCalToken = values.access_token;
-//   libcalQueries = ['bookings', 'locations', 'overdue', 'categories'];
-//   var promises = [];
-
-//   libcalQueries.forEach(element => {
-//     // only get category 8370: library software 
-//     if (element == 'categories') { var id = '/8370' } else { id = '' }
-
-//     libCalOptions.queryConfig.options.path = '/1.1/equipment/' + element + id;
-//     libCalOptions.queryConfig.options.headers = { Authorization: 'Bearer ' + libCalToken }
-//     // get a promise for each call
-//     promises[element] = new Promise((resolve, reject) => {
-//       // execute an API call
-//       console.log(libCalOptions.queryConfig.options)
-//       var query = require('./scripts/httpQuery')(libCalOptions.queryConfig)
-//         .then((result) => {
-//           fs.writeFile(path.join(__dirname, 'logs', element + '.log'), result, (err) => {
-//             console.log('Wrote new data to ' + element + '.log');
-//             resolve(result);
-//           });
-//         })
-//         .catch('Failed to retrieve ' + element)
-//     })
-//   });
-
-//   Promise.all([promises['bookings'], promises['locations'], promises['overdue'], promises['categories'], campus_ps_promise]).then((values) => {
-//     // const cats = JSON.parse(values[libcalQueries.indexOf('categories')])[0].categories;
-//     var userlists = [];
-//     const bookings =  JSON.parse(values[libcalQueries.indexOf('bookings')]);
-
-//     // build an array of object, one per category ID (category ID = kind of software (photoshop,illustrator, etc))
-//     bookings.forEach((entry) => {
-//       // console.log(entry.cid + ' : ' +entry.email)
-//       var cid = entry.cid;
-//       if (! userlists[cid]) { 
-//         userlists[cid] = []; 
-//         // console.log('created array entry for ', cid)
-//       }
-//       if (entry.email.includes('@miamioh.edu') || entry.email.includes('@muohio.edu')) {
-//         // console.log('tryna push ',entry.email)
-//         userlists[cid].push(entry.email.substring(0,entry.email.indexOf('@')));
-//       } else { 
-//         console.log('REJECTED NON-MIAMI ADDRESS: ',entry.email)
-//       }
-
-//     })
-//     //console.log(bookings)
-//     const ps_id = libCalOptions.software.photoshop.cid;
-//     console.log ('Photoshop checkouts in LibCal: ', userlists[ps_id])
-
-//   })
-// })
-
-

@@ -1,4 +1,14 @@
 module.exports = {
+  software: [
+    {
+    name: 'Adobe Photoshop',
+    shortName: 'photoshop'
+    },
+    {
+      name: 'Adobe Illustrator',
+      shortName: 'illustrator'
+    }
+  ],
   connectConfig: {
     options: {
       hostname: 'ws.apps.miamioh.edu',
@@ -21,7 +31,7 @@ module.exports = {
       options: {
         hostname: 'community.miamioh.edu',
         port: 443,
-        path: '/directory-accounts/api/members/',
+        pathStem: '/directory-accounts/api/members/',
         method: 'GET',
         headers: {
           'Accept': 'application/json'
