@@ -13,8 +13,9 @@ let campusPromises = new Promise((resolve, reject) => {
     campusOptions.queryConfig.get.options.headers.Authorization = campusToken.data.token;
     campusLists = getCampusLists();
     Promise.all([campusLists.photoshop, campusLists.illustrator]).then(values => {
- //     resolve( { photoshop: values[0], illustrator: values[1] })
-  console.log(values)
+      console.log('NOW: ',typeof values[0])
+      // resolve( { photoshop: JSON.parse(values[0]), illustrator: JSON.parse(values[1]) })
+      resolve( { photoshop: (values[0]), illustrator: (values[1]) })
     })
       .catch((error) => {
         console.error('Failed to get Campus info: ', error)
@@ -44,7 +45,6 @@ Promise.all([campusPromises, libCalPromises]).then((values) => {
   bookings = [];
   campus = values[0];
   libcal = values[1];
-  console.log(libcal.categories[0].categories)
   cids = libcal.categories[0].categories;
   cids.forEach(element => {
     if (element.name.includes('Photoshop')) {
@@ -55,9 +55,14 @@ Promise.all([campusPromises, libCalPromises]).then((values) => {
     }
   });
   cids.forEach(element => {
+    // return books for that software category (ps, illustrator, etc); return only uniqueID, not full email
+    // so far, no limiting by checkout dates -- need to add that
     bookings[element.campuscode] = libcal.bookings.filter(obj => { return obj.cid === element.cid }).map(obj => { return obj.email.substring(0, obj.email.indexOf('@')) });
   });
-  console.log(bookings)
+  campusOptions.software.forEach(item => {
+    console.log(item.name, '(LibCal):', bookings[item.shortName]);
+    console.log(item.name, '(Campus):', campus[item.shortName]);
+  });
   // let photoshop_bookings = libcal.bookings.filter(obj => {return obj.cid === 15705}).map(obj => { return obj.email.substring(0,obj.email.indexOf('@')) });
   // let illustrator_bookings = libcal.bookings.filter(obj => { return obj.cid === 15809 }).map(obj => { return obj.email });;
   /* can we subsequently filter by between-dates? */
@@ -67,6 +72,8 @@ Promise.all([campusPromises, libCalPromises]).then((values) => {
 }).catch((error) => {
   console.error(error)
 })
+
+/*********************************************** Functions (Should maybe be a class?) *************************************************************/
 
 // /* Campus functions */
 
@@ -80,7 +87,8 @@ function justUniqueIds(json) {
 }
 
 async function getOneCampusList(software) {
-  return await query(campusOptions.queryConfig.get);
+  let response = await query(campusOptions.queryConfig.get);
+  return justUniqueIds(JSON.parse(response));
 }
 
 function getCampusLists() {
@@ -88,7 +96,7 @@ function getCampusLists() {
   promises = [];
   software.forEach(element => {
     campusOptions.queryConfig.get.options.path = campusOptions.queryConfig.get.options.pathStem + 'dulb-patron' +element;
-    promises[element] = getOneCampusList(element);
+    promises[element] = (getOneCampusList(element))
   });
   return promises;
 }
