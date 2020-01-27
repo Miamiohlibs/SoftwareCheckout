@@ -11,9 +11,15 @@ let campusPromises = new Promise((resolve, reject) => {
   query(campusOptions.connectConfig).then(values => { // Query returns is a Promise too
     campusToken = JSON.parse(values);
     campusOptions.queryConfig.get.options.headers.Authorization = campusToken.data.token;
-    campusLists = getCampusLists();
-    Promise.all([campusLists.photoshop, campusLists.illustrator]).then(values => {
-      resolve({ photoshop: (values[0]), illustrator: (values[1]) })
+    campusLists = getCampusLists(); // campusLists has properties "promises" and "index"
+    console.log('campusLists', campusLists.promises)
+    Promise.all(campusLists.promises).then(values => {
+      console.log('raw values', values)
+      const obj = {};
+      for(var i=0; i<values.length; i++) {
+        obj[campusLists.index[i]] = values[i];
+      }
+      resolve(obj);
     })
       .catch((error) => {
         console.error('Failed to get Campus info: ', error)
@@ -55,12 +61,15 @@ Promise.all([campusPromises, libCalPromises]).then((values) => {
   cids.forEach(element => {
     // return books for that software category (ps, illustrator, etc); return only uniqueID, not full email
     // so far, no limiting by checkout dates -- NEED TO DO THAT
+    // console.log('Libcal bookings', libcal.bookings)
     bookings[element.campuscode] = libcal.bookings.filter(obj => { return obj.cid === element.cid }).map(obj => { return obj.email.substring(0, obj.email.indexOf('@')) });
   });
   campusOptions.software.forEach(item => {
     // console.log(item.name, '(LibCal):', bookings[item.shortName]);
     // console.log(item.name, '(Campus):', campus[item.shortName]);
   });
+  console.log ('Bookings: ', bookings);
+  console.log ('Campus Reg:', campus)
   UpdateGroupMembers(bookings, campus);
 }).catch((error) => {
   console.error(error)
@@ -135,11 +144,14 @@ async function getOneCampusList(software) {
 function getCampusLists() {
   const software = ['photoshop', 'illustrator'];
   promises = [];
+  console.log('type of promises: ', typeof promises)
+  index = []
   software.forEach(element => {
     campusOptions.queryConfig.get.options.path = campusOptions.queryConfig.get.options.pathStem + 'dulb-patron' + element;
-    promises[element] = (getOneCampusList(element))
+    promises.push(getOneCampusList(element))
+    index.push(element);
   });
-  return promises;
+  return { promises: promises, index: index };
 }
 /* end Campus function */
 
