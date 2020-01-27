@@ -2,9 +2,13 @@ const https = require('https');
 
 module.exports = function (queryOptions) {
   return new Promise((resolve, reject) => {
-    let query = doQuery(queryOptions.options, queryOptions.data);
-    resolve(query);
-  })
+    try{ 
+      let query = doQuery(queryOptions.options, queryOptions.data);
+      resolve(query);
+    } catch(err) {
+      reject(err);
+    }
+  });
 }
 
 async function doQuery(options, data) {
