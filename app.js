@@ -12,9 +12,7 @@ let campusPromises = new Promise((resolve, reject) => {
     campusToken = JSON.parse(values);
     campusOptions.queryConfig.get.options.headers.Authorization = campusToken.data.token;
     campusLists = getCampusLists(); // campusLists has properties "promises" and "index"
-    console.log('campusLists', campusLists.promises)
     Promise.all(campusLists.promises).then(values => {
-      console.log('raw values', values)
       const obj = {};
       for(var i=0; i<values.length; i++) {
         obj[campusLists.index[i]] = values[i];
@@ -50,16 +48,17 @@ Promise.all([campusPromises, libCalPromises]).then((values) => {
   campus = values[0];
   libcal = values[1];
   cids = libcal.categories[0].categories;
-  cids.forEach(element => {
-    if (element.name.includes('Photoshop')) {
-      element.campuscode = 'photoshop';
-    }
-    if (element.name.includes('Illustrator')) {
-      element.campuscode = 'illustrator';
-    }
+  // for each LibCal category, match it with the campus shortname defined in campusIT.js
+  // note: the LibCal.name must exactly match the .name property defined in campusIT.js
+  cids.forEach(libCalElement => {
+    campusOptions.software.map(item => {
+      if (libCalElement.name == item.name) {
+        libCalElement.campuscode = item.shortName;
+      }
+    })
   });
   cids.forEach(element => {
-    // return books for that software category (ps, illustrator, etc); return only uniqueID, not full email
+    // return books for that software category ("category" == "software package", etc); return only uniqueID, not full email
     // so far, no limiting by checkout dates -- NEED TO DO THAT
     // console.log('Libcal bookings', libcal.bookings)
     bookings[element.campuscode] = libcal.bookings.filter(obj => { return obj.cid === element.cid }).map(obj => { return obj.email.substring(0, obj.email.indexOf('@')) });
@@ -82,6 +81,7 @@ Promise.all([campusPromises, libCalPromises]).then((values) => {
 function UpdateGroupMembers(bookings, campus) {
   campusOptions.software.forEach(item => {
     // console.log(item.shortName,campus[item.shortName]);
+    Divider();
     console.log('UPDATE', item.name)
     idsToDelete = leftOnly(campus[item.shortName], bookings[item.shortName]);
     idsToAdd = leftOnly(bookings[item.shortName], campus[item.shortName]);
@@ -121,6 +121,7 @@ function campusDeletions(software, deletes) {
     campusOptions.queryConfig.delete.options.headers.Authorization = campusOptions.queryConfig.get.options.headers.Authorization
     promises[id] = oneCampusUpdate(campusOptions.queryConfig.delete);
   })
+  Divider();
   Promise.all(promises).then(values => {
     console.log(software, 'deletions complete');
   });
@@ -142,7 +143,9 @@ async function getOneCampusList(software) {
 }
 
 function getCampusLists() {
-  const software = ['photoshop', 'illustrator'];
+  // get list of campus software packages
+  const software = campusOptions.software.map(item => { return item.shortName})
+  console.log('NEW CAMPUS SOFTWARE LIST: ', software)
   promises = [];
   console.log('type of promises: ', typeof promises)
   index = []
@@ -185,3 +188,9 @@ function getLibCalLists(myToken, myLibCalOptions) {
   // console.log(promises)
   return promises;
 } //end fn getLibCalLists
+
+// Utilities:
+
+function Divider() {
+  console.log('============================================');
+}
