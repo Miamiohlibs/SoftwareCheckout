@@ -13,9 +13,7 @@ let campusPromises = new Promise((resolve, reject) => {
     campusOptions.queryConfig.get.options.headers.Authorization = campusToken.data.token;
     campusLists = getCampusLists();
     Promise.all([campusLists.photoshop, campusLists.illustrator]).then(values => {
-      // console.log('NOW: ',typeof values[0])
-      // resolve( { photoshop: JSON.parse(values[0]), illustrator: JSON.parse(values[1]) })
-      resolve( { photoshop: (values[0]), illustrator: (values[1]) })
+      resolve({ photoshop: (values[0]), illustrator: (values[1]) })
     })
       .catch((error) => {
         console.error('Failed to get Campus info: ', error)
@@ -56,7 +54,7 @@ Promise.all([campusPromises, libCalPromises]).then((values) => {
   });
   cids.forEach(element => {
     // return books for that software category (ps, illustrator, etc); return only uniqueID, not full email
-    // so far, no limiting by checkout dates -- need to add that
+    // so far, no limiting by checkout dates -- NEED TO DO THAT
     bookings[element.campuscode] = libcal.bookings.filter(obj => { return obj.cid === element.cid }).map(obj => { return obj.email.substring(0, obj.email.indexOf('@')) });
   });
   campusOptions.software.forEach(item => {
@@ -64,12 +62,6 @@ Promise.all([campusPromises, libCalPromises]).then((values) => {
     // console.log(item.name, '(Campus):', campus[item.shortName]);
   });
   UpdateGroupMembers(bookings, campus);
-  // let photoshop_bookings = libcal.bookings.filter(obj => {return obj.cid === 15705}).map(obj => { return obj.email.substring(0,obj.email.indexOf('@')) });
-  // let illustrator_bookings = libcal.bookings.filter(obj => { return obj.cid === 15809 }).map(obj => { return obj.email });;
-  /* can we subsequently filter by between-dates? */
-  /* then just return uniqueIds */
-  // console.log('PS: ', photoshop_bookings);
-  // console.log('ILL: ', illustrator_bookings);  
 }).catch((error) => {
   console.error(error)
 })
@@ -81,11 +73,11 @@ Promise.all([campusPromises, libCalPromises]).then((values) => {
 function UpdateGroupMembers(bookings, campus) {
   campusOptions.software.forEach(item => {
     // console.log(item.shortName,campus[item.shortName]);
-    console.log('UPDATE',item.name)
+    console.log('UPDATE', item.name)
     idsToDelete = leftOnly(campus[item.shortName], bookings[item.shortName]);
     idsToAdd = leftOnly(bookings[item.shortName], campus[item.shortName]);
-    console.log('ADD:',idsToAdd);
-    console.log('DELETE:',idsToDelete);
+    console.log('ADD:', idsToAdd);
+    console.log('DELETE:', idsToDelete);
     campusAdditions(item.shortName, idsToAdd);
     campusDeletions(item.shortName, idsToDelete);
   });
@@ -96,23 +88,23 @@ async function oneCampusUpdate(config) {
   return await query(config);
 }
 
-function campusAdditions (software, adds) {
+function campusAdditions(software, adds) {
   promises = []
   adds.forEach(id => {
     // campusOptions.queryConfig.post = campusOptions.queryConfig.get;
     campusOptions.queryConfig.post.options.path = campusOptions.queryConfig.post.options.pathStem + 'dulb-patron' + software;
     // campusOptions.queryConfig.post.options.method = 'POST';
-    campusOptions.queryConfig.post.data = {uniqueId: id}
+    campusOptions.queryConfig.post.data = { uniqueId: id }
     promises[id] = oneCampusUpdate(campusOptions.queryConfig.post);
   })
 
-    Promise.all(promises).then(values => {
-      console.log(software,'additions complete');
-    });
+  Promise.all(promises).then(values => {
+    console.log(software, 'additions complete');
+  });
 
 }
 
-function campusDeletions (software, deletes) {
+function campusDeletions(software, deletes) {
   promises = []
   deletes.forEach(id => {
     // campusOptions.queryConfig.post = campusOptions.queryConfig.get;
@@ -120,9 +112,9 @@ function campusDeletions (software, deletes) {
     campusOptions.queryConfig.delete.options.headers.Authorization = campusOptions.queryConfig.get.options.headers.Authorization
     promises[id] = oneCampusUpdate(campusOptions.queryConfig.delete);
   })
-    Promise.all(promises).then(values => {
-      console.log(software,'deletions complete');
-    });
+  Promise.all(promises).then(values => {
+    console.log(software, 'deletions complete');
+  });
 
 }
 // takes an array of campus user info from the API and just returns a list of uniqueIds from the uniqueId field
@@ -141,10 +133,10 @@ async function getOneCampusList(software) {
 }
 
 function getCampusLists() {
-  const software = ['photoshop','illustrator'];
+  const software = ['photoshop', 'illustrator'];
   promises = [];
   software.forEach(element => {
-    campusOptions.queryConfig.get.options.path = campusOptions.queryConfig.get.options.pathStem + 'dulb-patron' +element;
+    campusOptions.queryConfig.get.options.path = campusOptions.queryConfig.get.options.pathStem + 'dulb-patron' + element;
     promises[element] = (getOneCampusList(element))
   });
   return promises;
