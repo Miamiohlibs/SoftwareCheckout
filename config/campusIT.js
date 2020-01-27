@@ -1,8 +1,8 @@
 module.exports = {
   software: [
     {
-    name: 'Adobe Photoshop',
-    shortName: 'photoshop'
+      name: 'Adobe Photoshop',
+      shortName: 'photoshop'
     },
     {
       name: 'Adobe Illustrator',
@@ -63,6 +63,6 @@ module.exports = {
       }
     }
   }
-  
+
 }
 

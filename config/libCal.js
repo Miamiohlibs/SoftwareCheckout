@@ -1,5 +1,5 @@
 module.exports = {
-  credentials : {
+  credentials: {
     client: {
       id: '527',
       secret: 'b566c23fdf8afc947a4426394b0ffb02',
