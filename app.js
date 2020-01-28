@@ -4,12 +4,21 @@ const query = require('./scripts/httpQuery');
 const campusOptions = require('./config/campusIT');
 const leftOnly = require('./scripts/leftOnly');
 const express = require('express');
+const moment = require('moment');
 
 const app = express();
-const port = 3000
+const port = 9000;
 app.get('/', (req, res) => {
+  TheBusiness();
+  res.send('Updating permissions groups at: '+ moment().format('YYYY-MM-DD HH:mm:ss'));
+});
 
+app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 
+// on startup, run TheBusiness once, then wait for subsequent Express requests
+TheBusiness();
+
+function TheBusiness() {
   // Initiate Campus Requests
   let campusPromises = new Promise((resolve, reject) => {
     // Get the Campus IT Token
@@ -94,18 +103,7 @@ app.get('/', (req, res) => {
   }).catch((error) => {
     console.error(error)
   })
-
-
-
-  res.send('Doing the thing (I hope)!');
-});
-
-
-
-
-app.listen(port, () => console.log(`Example app listening on port ${port}!`));
-
-
+}
 /*********************************************** Functions (Should maybe be a class?) *************************************************************/
 
 // /* Campus functions */
@@ -127,6 +125,7 @@ function UpdateGroupMembers(bookings, campus) {
       Divider();
     }
   });
+  console.log('Finished update :',Date.now())
 }
 
 async function oneCampusUpdate(config) {
