@@ -23,13 +23,6 @@ module.exports = {
       bodyFormat: 'form'
     }
   },
-  software: {
-    photoshop: {
-      cid: 15705,
-      name: 'Adobe Photoshop',
-      groupName: 'dulb-patronphotoshop'
-    }
-  },
   queryConfig: {
     options: {
       hostname: 'muohio.libcal.com',

@@ -20,6 +20,8 @@ function doRequest(options, data) {
 
     // console.log('doRequest options: ', options)
     const req = https.request(options, (res) => {
+      console.log(options);
+      console.log(data)
       res.setEncoding('utf8');
       let responseBody = '';
 
