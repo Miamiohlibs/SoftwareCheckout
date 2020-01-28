@@ -7,6 +7,14 @@ module.exports = {
     {
       name: 'Adobe Illustrator',
       shortName: 'illustrator'
+    },
+    { 
+      name: 'Adobe Creative Cloud',
+      shortName: 'adobecc'
+    },
+    {
+      name: 'Bad List',
+      shortName: 'badlist'
     }
   ],
   connectConfig: {

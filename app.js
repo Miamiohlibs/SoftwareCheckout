@@ -15,7 +15,12 @@ let campusPromises = new Promise((resolve, reject) => {
     Promise.all(campusLists.promises).then(values => {
       const obj = {};
       for (var i = 0; i < values.length; i++) {
-        obj[campusLists.index[i]] = values[i];
+        if (values[i] === 'failed') {
+          // this error is re-iterated later too
+          console.error('Warning: Failed to retreive campus list for: ', campusLists.index[i]);
+        } else { 
+          obj[campusLists.index[i]] = values[i];
+        }
       }
       resolve(obj);
     })
@@ -93,12 +98,17 @@ function UpdateGroupMembers(bookings, campus) {
     // console.log(item.shortName,campus[item.shortName]);
     Divider();
     console.log('UPDATE', item.name)
-    idsToDelete = leftOnly(campus[item.shortName], bookings[item.shortName]);
-    idsToAdd = leftOnly(bookings[item.shortName], campus[item.shortName]);
-    console.log('ADD:', idsToAdd);
-    console.log('DELETE:', idsToDelete);
-    campusAdditions(item.shortName, idsToAdd);
-    campusDeletions(item.shortName, idsToDelete);
+    if (Array.isArray(campus[item.shortName])) {
+      idsToDelete = leftOnly(campus[item.shortName], bookings[item.shortName]);
+      idsToAdd = leftOnly(bookings[item.shortName], campus[item.shortName]);
+      console.log('ADD:', idsToAdd);
+      console.log('DELETE:', idsToDelete);
+      campusAdditions(item.shortName, idsToAdd);
+      campusDeletions(item.shortName, idsToDelete);
+    } else {
+      console.error("Warning: Could not get response from ActiveDirectory for:", item.shortName)
+      Divider();
+    }
   });
 }
 
@@ -149,7 +159,11 @@ function justUniqueIds(json) {
 async function getOneCampusList(software) {
   let response = await query(campusOptions.queryConfig.get);
   // console.log(response)
-  return justUniqueIds(JSON.parse(response));
+  if(Array.isArray(JSON.parse(response))) {
+    return justUniqueIds(JSON.parse(response));
+  } else {
+    return ('failed');
+  }
 }
 
 function getCampusLists() {
