@@ -9,7 +9,7 @@ module.exports = {
       name: 'Adobe Illustrator',
       shortName: 'illustrator'
     },
-    { 
+    {
       name: 'Adobe Creative Cloud',
       shortName: 'adobecc'
     }
