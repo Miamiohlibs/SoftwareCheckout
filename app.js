@@ -4,25 +4,6 @@ const query = require('./scripts/httpQuery');
 const campusOptions = require('./config/campusIT');
 const leftOnly = require('./scripts/leftOnly');
 
-these_book = [
-  {
-    fromDate: '2008-10-01',
-    toDate: '2009-01-10',
-    id: 1
-  },
-  {
-    fromDate: '2018-10-01',
-    toDate: '2020-02-10',
-    id: 2
-  }
-]
-let now_book = these_book.filter(obj => {
-  let toDate = Date.parse(obj.toDate);
-  let fromDate = Date.parse(obj.fromDate);
-  return ((Date.now() > fromDate) && (Date.now() < toDate))
-})
-console.log( now_book)
-
 // Initiate Campus Requests
 let campusPromises = new Promise((resolve, reject) => {
   // Get the Campus IT Token
@@ -33,7 +14,7 @@ let campusPromises = new Promise((resolve, reject) => {
     campusLists = getCampusLists(); // campusLists has properties "promises" and "index"
     Promise.all(campusLists.promises).then(values => {
       const obj = {};
-      for(var i=0; i<values.length; i++) {
+      for (var i = 0; i < values.length; i++) {
         obj[campusLists.index[i]] = values[i];
       }
       resolve(obj);
@@ -67,7 +48,7 @@ Promise.all([campusPromises, libCalPromises]).then((values) => {
   campus = values[0];
   libcal = values[1];
   cids = libcal.categories[0].categories;
-  console.log(libcal.bookings)
+  // console.log(libcal.bookings)
   // for each LibCal category, match it with the campus shortname defined in campusIT.js
   // note: the LibCal.name must exactly match the .name property defined in campusIT.js
   cids.forEach(libCalElement => {
@@ -88,16 +69,17 @@ Promise.all([campusPromises, libCalPromises]).then((values) => {
       let toDate = Date.parse(obj.toDate);
       let fromDate = Date.parse(obj.fromDate);
       return ((Date.now() > fromDate) && (Date.now() < toDate))
-    })
-    bookings[element.campuscode] = current_bookings.map(obj => { return obj.email.substring(0, obj.email.indexOf('@')) });
+    });
+    let confirmed_bookings = current_bookings.filter(obj => { return obj.status === 'Confirmed' });
+    bookings[element.campuscode] = confirmed_bookings.map(obj => { return obj.email.substring(0, obj.email.indexOf('@')) });
 
   });
   campusOptions.software.forEach(item => {
     // console.log(item.name, '(LibCal):', bookings[item.shortName]);
     // console.log(item.name, '(Campus):', campus[item.shortName]);
   });
-  console.log ('Bookings: ', bookings);
-  console.log ('Campus Reg:', campus)
+  console.log('Bookings: ', bookings);
+  console.log('Campus Reg:', campus)
   UpdateGroupMembers(bookings, campus);
 }).catch((error) => {
   console.error(error)
@@ -173,10 +155,8 @@ async function getOneCampusList(software) {
 
 function getCampusLists() {
   // get list of campus software packages
-  const software = campusOptions.software.map(item => { return item.shortName})
-  console.log('NEW CAMPUS SOFTWARE LIST: ', software)
+  const software = campusOptions.software.map(item => { return item.shortName })
   promises = [];
-  console.log('type of promises: ', typeof promises)
   index = []
   software.forEach(element => {
     campusOptions.queryConfig.get.options.path = campusOptions.queryConfig.get.options.pathStem + 'dulb-patron' + element;
