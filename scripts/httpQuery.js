@@ -2,10 +2,10 @@ const https = require('https');
 
 module.exports = function (queryOptions) {
   return new Promise((resolve, reject) => {
-    try{ 
+    try {
       let query = doQuery(queryOptions.options, queryOptions.data);
       resolve(query);
-    } catch(err) {
+    } catch (err) {
       reject(err);
     }
   });
@@ -20,8 +20,7 @@ function doRequest(options, data) {
 
     // console.log('doRequest options: ', options)
     const req = https.request(options, (res) => {
-      console.log(options);
-      console.log(data)
+      // console.log(options);
       res.setEncoding('utf8');
       let responseBody = '';
 
@@ -30,6 +29,7 @@ function doRequest(options, data) {
       });
 
       res.on('end', () => {
+        // console.log('RESPONSE: ', responseBody)
         resolve(responseBody);
       });
     });
@@ -38,7 +38,9 @@ function doRequest(options, data) {
       reject(err);
     });
 
-    if (data !== undefined) { req.write(JSON.stringify(data)); }
+    if (data !== undefined) {
+      req.write(JSON.stringify(data));
+    }
     req.end();
   });
 };

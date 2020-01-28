@@ -122,10 +122,9 @@ function campusAdditions(software, adds) {
   adds.forEach(id => {
     // campusOptions.queryConfig.post = campusOptions.queryConfig.get;
     campusOptions.queryConfig.post.options.path = campusOptions.queryConfig.post.options.pathStem + 'dulb-patron' + software;
-    // campusOptions.queryConfig.post.options.method = 'POST';
-    console.log('DO ADDITION: ',id)
+    campusOptions.queryConfig.post.options.headers.Authorization = campusOptions.queryConfig.get.options.headers.Authorization
     campusOptions.queryConfig.post.data = { uniqueId: id }
-    console.log(campusOptions.queryConfig.post)
+    // console.log(campusOptions.queryConfig.post)
     promises[id] = oneCampusUpdate(campusOptions.queryConfig.post);
   })
 

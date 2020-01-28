@@ -11,10 +11,6 @@ module.exports = {
     { 
       name: 'Adobe Creative Cloud',
       shortName: 'adobecc'
-    },
-    {
-      name: 'Bad List',
-      shortName: 'badlist'
     }
   ],
   connectConfig: {
