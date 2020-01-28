@@ -1,4 +1,5 @@
 module.exports = {
+  softwareLocation: 8370,
   credentials: {
     client: {
       id: '527',

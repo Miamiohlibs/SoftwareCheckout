@@ -184,13 +184,16 @@ function getCampusLists() {
 /* LibCal functions */
 
 async function getOneLibCalList(element, token, libCalOptions) {
-  // only get category 8370: library software 
-  if (element == 'categories') { var id = '/8370' } else { id = '' }
+  // only get location: library software 
+  if (element == 'categories') { var id = '/' + libCalOptions.softwareLocation } else { id = '' }
 
   libCalOptions.queryConfig.options.path = '/1.1/equipment/' + element + id;
   libCalOptions.queryConfig.options.headers = { Authorization: 'Bearer ' + token }
-  // get a promise for each call
+  if (element == 'bookings') { 
+    libCalOptions.queryConfig.options.path += '?limit=100&lid=' + libCalOptions.softwareLocation;
+  }
 
+  // get a promise for each call
   promise = await query(libCalOptions.queryConfig).then((response) => {
     return (response);
   });
