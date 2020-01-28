@@ -1,4 +1,5 @@
 module.exports = {
+  nodePort: 9001,
   software: [
     {
       name: 'Adobe Photoshop',
