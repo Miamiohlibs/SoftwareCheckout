@@ -11,6 +11,11 @@ Looks up software bookings from the LibCal API and updates the membership of cor
 * config/libCal.js: includes API key, config for requesting an API token, and query config for making API requests with the token.
 * config/campusIT.js: includes list of software, config for requesting the AD API token, and query configs CRUD API requests to ActiveDirectory.
 
+## Run the app
+
+* `node app` - run once
+* `node app --express` - run once, then listen on port 9000 for subsequent updates
+
 ## Helper files (not part of the app): 
 
 * data.json: contains credentials for campus authentication
