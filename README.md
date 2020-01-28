@@ -14,7 +14,7 @@ Looks up software bookings from the LibCal API and updates the membership of cor
 ## Run the app
 
 * `node app` - run once
-* `node app --express` - run once, then listen on port 9000 for subsequent updates
+* `node app --listen` - run once, then listen on port 9000 (or port specified in campusIT.nodePort) for subsequent updates
 
 ## Helper files (not part of the app): 
 

@@ -7,9 +7,9 @@ const express = require('express');
 const moment = require('moment');
 
 const myArgs = process.argv.slice(2);
-if(myArgs.includes('--express')) { 
+if(myArgs.includes('--listen')) { 
   const app = express();
-  const port = 9000;
+  const port = campusOptions.nodePort || 9000;
   app.get('/', (req, res) => {
     TheBusiness();
     res.send('Updating permissions groups at: '+ moment().format('YYYY-MM-DD HH:mm:ss'));
