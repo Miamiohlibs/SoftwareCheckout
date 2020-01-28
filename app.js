@@ -7,18 +7,15 @@ const express = require('express');
 const moment = require('moment');
 
 const myArgs = process.argv.slice(2);
-if(myArgs.includes('--listen')) { 
+if (myArgs.includes('--listen')) {
   const app = express();
   const port = campusOptions.nodePort || 9000;
   app.get('/', (req, res) => {
     TheBusiness();
-    res.send('Updating permissions groups at: '+ moment().format('YYYY-MM-DD HH:mm:ss'));
+    res.send('Updating permissions groups at: ' + moment().format('YYYY-MM-DD HH:mm:ss'));
   });
-  
   app.listen(port, () => console.log(`SoftwareCheckout app listening on port ${port}!`));
 }
-
-
 
 // on startup, run TheBusiness once, then wait for subsequent Express requests
 TheBusiness();
@@ -130,7 +127,7 @@ function UpdateGroupMembers(bookings, campus) {
       Divider();
     }
   });
-  console.log('Finished update :',Date.now())
+  console.log('Finished update :', Date.now())
 }
 
 async function oneCampusUpdate(config) {
