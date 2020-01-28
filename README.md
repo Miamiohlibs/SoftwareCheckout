@@ -16,5 +16,7 @@ Looks up software bookings from the LibCal API and updates the membership of cor
 * data.json: contains credentials for campus authentication
 * getToken.sh: run this on the commmand line to get a campus token (uses data.json for auth)
 * setFakeData.sh: run this on the command like with a token as a sole argument to re-populate campus lists with some people
+* testPost.sh: add name to one list for one group
+* fetchCC: get the AD list for one group
 * notes.txt: Dirk's notes documenting the campus AD API
 
