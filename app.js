@@ -62,24 +62,23 @@ Promise.all([campusPromises, libCalPromises]).then((values) => {
     // return books for that software category ("category" == "software package", etc); return only uniqueID, not full email
     // so far, no limiting by checkout dates -- NEED TO DO THAT
     // console.log('Libcal bookings', libcal.bookings)
-    // bookings[element.campuscode] = libcal.bookings.filter(obj => { return obj.cid === element.cid }).map(obj => { return obj.email.substring(0, obj.email.indexOf('@')) });
+
+    // only look at bookings in the current category (cid)
     let category_bookings = libcal.bookings.filter(obj => { return obj.cid === element.cid });
-    // console.log("category_bookings for CID", element.cid, category_bookings);
+
+    // limit to current bookings (not future bookings)
     let current_bookings = category_bookings.filter(obj => {
       let toDate = Date.parse(obj.toDate);
       let fromDate = Date.parse(obj.fromDate);
       return ((Date.now() > fromDate) && (Date.now() < toDate))
     });
+
+    // limit to confirmed bookings (not cancelled, etc)
     let confirmed_bookings = current_bookings.filter(obj => { return obj.status === 'Confirmed' });
     bookings[element.campuscode] = confirmed_bookings.map(obj => { return obj.email.substring(0, obj.email.indexOf('@')) });
-
   });
-  campusOptions.software.forEach(item => {
-    // console.log(item.name, '(LibCal):', bookings[item.shortName]);
-    // console.log(item.name, '(Campus):', campus[item.shortName]);
-  });
-  console.log('Bookings: ', bookings);
-  console.log('Campus Reg:', campus)
+  console.log('LibCal Bookings: ', bookings);
+  console.log('Campus Lists:', campus)
   UpdateGroupMembers(bookings, campus);
 }).catch((error) => {
   console.error(error)
