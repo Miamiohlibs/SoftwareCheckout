@@ -4,6 +4,25 @@ const query = require('./scripts/httpQuery');
 const campusOptions = require('./config/campusIT');
 const leftOnly = require('./scripts/leftOnly');
 
+these_book = [
+  {
+    fromDate: '2008-10-01',
+    toDate: '2009-01-10',
+    id: 1
+  },
+  {
+    fromDate: '2018-10-01',
+    toDate: '2020-02-10',
+    id: 2
+  }
+]
+let now_book = these_book.filter(obj => {
+  let toDate = Date.parse(obj.toDate);
+  let fromDate = Date.parse(obj.fromDate);
+  return ((Date.now() > fromDate) && (Date.now() < toDate))
+})
+console.log( now_book)
+
 // Initiate Campus Requests
 let campusPromises = new Promise((resolve, reject) => {
   // Get the Campus IT Token
@@ -48,6 +67,7 @@ Promise.all([campusPromises, libCalPromises]).then((values) => {
   campus = values[0];
   libcal = values[1];
   cids = libcal.categories[0].categories;
+  console.log(libcal.bookings)
   // for each LibCal category, match it with the campus shortname defined in campusIT.js
   // note: the LibCal.name must exactly match the .name property defined in campusIT.js
   cids.forEach(libCalElement => {
@@ -61,7 +81,16 @@ Promise.all([campusPromises, libCalPromises]).then((values) => {
     // return books for that software category ("category" == "software package", etc); return only uniqueID, not full email
     // so far, no limiting by checkout dates -- NEED TO DO THAT
     // console.log('Libcal bookings', libcal.bookings)
-    bookings[element.campuscode] = libcal.bookings.filter(obj => { return obj.cid === element.cid }).map(obj => { return obj.email.substring(0, obj.email.indexOf('@')) });
+    // bookings[element.campuscode] = libcal.bookings.filter(obj => { return obj.cid === element.cid }).map(obj => { return obj.email.substring(0, obj.email.indexOf('@')) });
+    let category_bookings = libcal.bookings.filter(obj => { return obj.cid === element.cid });
+    // console.log("category_bookings for CID", element.cid, category_bookings);
+    let current_bookings = category_bookings.filter(obj => {
+      let toDate = Date.parse(obj.toDate);
+      let fromDate = Date.parse(obj.fromDate);
+      return ((Date.now() > fromDate) && (Date.now() < toDate))
+    })
+    bookings[element.campuscode] = current_bookings.map(obj => { return obj.email.substring(0, obj.email.indexOf('@')) });
+
   });
   campusOptions.software.forEach(item => {
     // console.log(item.name, '(LibCal):', bookings[item.shortName]);
