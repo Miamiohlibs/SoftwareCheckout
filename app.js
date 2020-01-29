@@ -56,6 +56,12 @@ function TheBusiness() {
       const libCalToken = values.access_token;
       libCalLists = getLibCalLists(libCalToken, libCalOptions);
       Promise.all([libCalLists.bookings, libCalLists.categories]).then(values => {
+        fs.writeFile('logs/bookings.log', JSON.stringify(JSON.parse(values[0]), null, '\t'), (err) => {
+          if (err !== null) {console.log('Error writing bookings log:', err ); }
+        })
+        fs.writeFile('logs/categories.log', JSON.stringify(JSON.parse(values[1]), null, '\t'), (err) => {
+          if (err !== null) {console.log('Error writing categories log:', err ); }
+        })
         resolve({ bookings: JSON.parse(values[0]), categories: JSON.parse(values[1]) });
       })
     })
