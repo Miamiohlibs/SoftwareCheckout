@@ -95,6 +95,7 @@ module.exports = {
   },
 
   convertEmailToUniq: async function (email) {
+    if (! email.includes('@')) { email += '@miamioh.edu'; }
     const escapedEmail = encodeURIComponent(email);
     campusOptions.queryConfig.convert.options.path = campusOptions.queryConfig.convert.options.pathStem + escapedEmail;
     let response  = await query(campusOptions.queryConfig.convert);
