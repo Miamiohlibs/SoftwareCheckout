@@ -23,6 +23,9 @@ if (myArgs.includes('--listen')) {
 TheBusiness();
 
 function TheBusiness() {
+  utils.Divider();
+  console.log('Starting update at:',moment().format('YYYY-MM-DD HH:mm:ss'));
+
   // Initiate Campus Requests
   let campusPromises = new Promise((resolve, reject) => {
     // Get the Campus IT Token
@@ -117,7 +120,10 @@ function TheBusiness() {
       console.log('LibCal Bookings: ', bookings);
       console.log('Campus Lists:', campusP)
       campus.UpdateGroupMembers(bookings, campusP);
-    });
+    }).then( () => {
+      console.log('Finished update at:',moment().format('YYYY-MM-DD HH:mm:ss'));
+      utils.Divider();
+});
   }).catch((error) => {
     console.error(error)
   })
