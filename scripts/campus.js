@@ -22,7 +22,6 @@ module.exports = {
         utils.Divider();
       }
     });
-    console.log('Finished update :', Date.now())
   },
 
   oneCampusUpdate: async function (config) {

@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node app",
-    "server": "node app --listen --name=software-checkout",
+    "server": "node app --listen --name=software-checkout >> logs/program.log &",
     "dev": "nodemon app"
   },
   "author": "Ken Irwin",
