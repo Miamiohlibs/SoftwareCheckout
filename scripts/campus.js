@@ -53,7 +53,7 @@ module.exports = {
       // campusOptions.queryConfig.post = campusOptions.queryConfig.get;
       campusOptions.queryConfig.delete.options.path = campusOptions.queryConfig.delete.options.pathStem + 'dulb-patron' + software + '/' + id;
       campusOptions.queryConfig.delete.options.headers.Authorization = campusOptions.queryConfig.get.options.headers.Authorization
-      promises[id] = oneCampusUpdate(campusOptions.queryConfig.delete);
+      promises[id] = this.oneCampusUpdate(campusOptions.queryConfig.delete);
     })
     utils.Divider();
     Promise.all(promises).then(values => {
@@ -92,5 +92,14 @@ module.exports = {
       index.push(element);
     });
     return { promises: promises, index: index };
+  },
+
+  convertEmailToUniq: async function (email) {
+    const escapedEmail = encodeURIComponent(email);
+    campusOptions.queryConfig.convert.options.path = campusOptions.queryConfig.convert.options.pathStem + escapedEmail;
+    let response  = await query(campusOptions.queryConfig.convert);
+    let data = JSON.parse(response);
+    uniq = data.data.uid;
+    return uniq; // this is a promise, not a string!
   }
 }

@@ -66,6 +66,14 @@ module.exports = {
           'Content-Type': 'application/json'
         }
       }
+    },
+    convert: {
+      options: {
+        hostname: 'ws.apps.miamioh.edu',
+        port: 443,
+        pathStem: '/api/directory/v1/query/mailLookup?q=',
+        method: 'GET'
+      }
     }
   }
 
