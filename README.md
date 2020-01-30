@@ -15,6 +15,7 @@ Looks up software bookings from the LibCal API and updates the membership of cor
 
 * `node app` - run once
 * `node app --listen` - run once, then listen on port 9000 (or port specified in campusIT.nodePort) for subsequent updates
+* let's use `npm run server` in production: it will add the `--listen` flag as well as `--name=software-checkout` so we can see which node process it is
 
 ## Helper files (not part of the app): 
 
