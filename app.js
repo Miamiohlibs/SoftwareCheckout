@@ -105,17 +105,20 @@ function TheBusiness() {
 
       // limit to confirmed bookings (not cancelled, etc)
       let confirmed_bookings = current_bookings.filter(obj => { return obj.status === 'Confirmed' });
-      bookings[element.campuscode] = confirmed_bookings.map(obj => { return obj.email.substring(0, obj.email.indexOf('@')) });
+
+      // convert email addresses to uniqueIds
+      emailPromises = confirmed_bookings.map(item => { return campus.convertEmailToUniq(item.email) });
+      Promise.all(emailPromises).then(data => {
+        bookings[element.campuscode] = data;
+      })
     });
-    console.log('LibCal Bookings: ', bookings);
-    console.log('Campus Lists:', campusP)
-    campus.UpdateGroupMembers(bookings, campusP);
+
+    Promise.all(emailPromises).then(() => {
+      console.log('LibCal Bookings: ', bookings);
+      console.log('Campus Lists:', campusP)
+      campus.UpdateGroupMembers(bookings, campusP);
+    });
   }).catch((error) => {
     console.error(error)
   })
 }
-/*********************************************** Functions (Should maybe be a class?) *************************************************************/
-
-
-
-
