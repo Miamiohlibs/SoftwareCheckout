@@ -24,7 +24,7 @@ TheBusiness();
 
 function TheBusiness() {
   utils.Divider();
-  console.log('Starting update at:',moment().format('YYYY-MM-DD HH:mm:ss'));
+  console.log('Starting update at:', moment().format('YYYY-MM-DD HH:mm:ss'));
 
   // Initiate Campus Requests
   let campusPromises = new Promise((resolve, reject) => {
@@ -57,26 +57,35 @@ function TheBusiness() {
     const { oauth2, getToken, libCalOptions } = require('./scripts/libCalAuth');
 
     // With Token, make API calls
-    getToken().then(values => {
+    topLevel = getToken().then(values => {
       const libCalToken = values.access_token;
-      const libCalLists = libCal.getLibCalLists(libCalToken, libCalOptions);
-      Promise.all([libCalLists.bookings, libCalLists.categories]).then(values => {
-        fs.writeFile('logs/bookings.log', JSON.stringify(JSON.parse(values[0]), null, '\t'), (err) => {
-          if (err !== null) { console.log('Error writing bookings log:', err); }
-        })
-        fs.writeFile('logs/categories.log', JSON.stringify(JSON.parse(values[1]), null, '\t'), (err) => {
-          if (err !== null) { console.log('Error writing categories log:', err); }
-        })
-        resolve({ bookings: JSON.parse(values[0]), categories: JSON.parse(values[1]) });
-      })
-    })
-      .catch((error) => {
-        console.error('Failed to get LibCal info: ', error)
-      });
-  })
+      bookingPromises = libCal.getLibCalLists(libCalToken, libCalOptions).then((promises) => {
+        return Promise.all(promises).then(values => {
+          // console.log('into the promise returns')
+          // console.log(values)
+          libCalBooking = [];
+          // Log bookings data from LibCal API
+          let bookingLog = '\n=======================================\n'
+            + 'Updated: ' + moment().format('YYYY-MM-DD HH:mm:ss') + '\n';
+          values.forEach(obj => {
+            bookingLog += '\n' + obj.cid + ' : ' + obj.name + '\n';
+            bookingLog += JSON.stringify(obj.bookings, null, '\t') + '\n';
+            libCalBooking[obj.name] = obj.bookings.map(lcObj => { return lcObj.email });
+          }); // end foreach obj
+          fs.writeFile('logs/bookings.log', bookingLog, (error) => { if (error) throw error });
+          // should also update the category log
+          return libCalBooking;
+        }) // end Promise.all(promises)
+      }); // end then / after libcal.getLibCalLists
+      return bookingPromises;
+    });
+    resolve(topLevel)
+    return topLevel;
+  });
 
   // Compare results of Campus and LibCal results
   Promise.all([campusPromises, libCalPromises]).then((values) => {
+    console.log(values)
     bookings = [];
     campusP = values[0];
     libcalP = values[1];
@@ -120,10 +129,10 @@ function TheBusiness() {
       console.log('LibCal Bookings: ', bookings);
       console.log('Campus Lists:', campusP)
       campus.UpdateGroupMembers(bookings, campusP);
-    }).then( () => {
-      console.log('Finished update at:',moment().format('YYYY-MM-DD HH:mm:ss'));
+    }).then(() => {
+      console.log('Finished update at:', moment().format('YYYY-MM-DD HH:mm:ss'));
       utils.Divider();
-});
+    });
   }).catch((error) => {
     console.error(error)
   })
