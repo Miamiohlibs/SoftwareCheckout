@@ -74,7 +74,11 @@ function TheBusiness() {
           }); // end foreach obj
           fs.writeFile('logs/bookings.log', bookingLog, (error) => { if (error) throw error });
           // should also update the category log
-          return libCalBooking;
+          // console.log(libCalBooking);
+          libCalInfo = {categories: values[0].categories, bookings: libCalBooking.flat(1)}
+          // return libCalBooking;
+          console.log(libCalInfo)
+          return libCalInfo;
         }) // end Promise.all(promises)
       }); // end then / after libcal.getLibCalLists
       return bookingPromises;
@@ -88,9 +92,9 @@ function TheBusiness() {
     //console.log(values)
     bookings = [];
     campusP = values[0];
-    libcalP = values[1].flat(1);
+    libcalP = values[1];
     console.log(libcalP)
-    cids = libcalP.categories[0].categories;
+    cids = libcalP.categories.categories;
     // console.log(libcal.bookings)
     // for each LibCal category, match it with the campus shortname defined in campusIT.js
     // note: the LibCal.name must exactly match the .name property defined in campusIT.js
