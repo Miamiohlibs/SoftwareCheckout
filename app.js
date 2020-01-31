@@ -63,18 +63,18 @@ function TheBusiness() {
         return Promise.all(promises).then(values => {
           // console.log('into the promise returns')
           // console.log(values)
-          libCalBooking = [];
+          // libCalBooking = [];
           // Log bookings data from LibCal API
           let bookingLog = '\n=======================================\n'
             + 'Updated: ' + moment().format('YYYY-MM-DD HH:mm:ss') + '\n';
           values.forEach(obj => {
             bookingLog += '\n' + obj.cid + ' : ' + obj.name + '\n';
             bookingLog += JSON.stringify(obj.bookings, null, '\t') + '\n';
-            libCalBooking[obj.name] = obj.bookings.map(lcObj => { return lcObj.email });
+            libCalBooking[obj.name] = obj.bookings.map(lcObj => { return lcObj });
           }); // end foreach obj
           fs.writeFile('logs/bookings.log', bookingLog, (error) => { if (error) throw error });
           // should also update the category log
-          return libCalBooking;
+          return values;
         }) // end Promise.all(promises)
       }); // end then / after libcal.getLibCalLists
       return bookingPromises;
