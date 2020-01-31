@@ -61,9 +61,8 @@ function TheBusiness() {
       const libCalToken = values.access_token;
       bookingPromises = libCal.getLibCalLists(libCalToken, libCalOptions).then((promises) => {
         return Promise.all(promises).then(values => {
-          // console.log('into the promise returns')
           // console.log(values)
-           libCalBooking = [];
+          libCalBooking = [];
           // Log bookings data from LibCal API
           let bookingLog = '\n=======================================\n'
             + 'Updated: ' + moment().format('YYYY-MM-DD HH:mm:ss') + '\n';
@@ -74,13 +73,12 @@ function TheBusiness() {
           }); // end foreach obj
           fs.writeFile('logs/bookings.log', bookingLog, (error) => { if (error) throw error });
           // should also update the category log
-          // console.log(libCalBooking);
-          libCalInfo = {categories: values[0].categories, bookings: libCalBooking.flat(1)}
-          // return libCalBooking;
-          console.log(libCalInfo)
+          libCalInfo = { categories: values[0].categories, bookings: libCalBooking.flat(1) }
+          // console.log(libCalInfo)
           return libCalInfo;
         }) // end Promise.all(promises)
-      }); // end then / after libcal.getLibCalLists
+      })
+      .catch(err => { console.error('Failed to return booking promises:', err)}); // end then / after libcal.getLibCalLists
       return bookingPromises;
     });
     resolve(topLevel)
@@ -93,7 +91,7 @@ function TheBusiness() {
     bookings = [];
     campusP = values[0];
     libcalP = values[1];
-    console.log(libcalP)
+    // console.log(libcalP);
     cids = libcalP.categories.categories;
     // console.log(libcal.bookings)
     // for each LibCal category, match it with the campus shortname defined in campusIT.js

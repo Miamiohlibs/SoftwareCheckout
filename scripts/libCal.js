@@ -29,10 +29,10 @@ module.exports = {
     cats = JSON.parse(response)[0];
     const categories = cats; // make a static copy to return in each object
     // console.log(cats);
-    promises = cats.categories.map(async item=> {
+    promises = cats.categories.map(async item => {
       let response = await this.getOneLibCalList('bookings', token, libCalOptions, "&cid=" + item.cid);
       let p = JSON.parse(response);
-      let obj = { cid: item.cid, name: item.name, bookings: p, categories: categories}
+      let obj = { cid: item.cid, name: item.name, bookings: p, categories: categories }
       // console.log(obj)
       return obj;
     })
