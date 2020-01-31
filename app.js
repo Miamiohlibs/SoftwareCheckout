@@ -63,18 +63,18 @@ function TheBusiness() {
         return Promise.all(promises).then(values => {
           // console.log('into the promise returns')
           // console.log(values)
-          // libCalBooking = [];
+           libCalBooking = [];
           // Log bookings data from LibCal API
           let bookingLog = '\n=======================================\n'
             + 'Updated: ' + moment().format('YYYY-MM-DD HH:mm:ss') + '\n';
           values.forEach(obj => {
             bookingLog += '\n' + obj.cid + ' : ' + obj.name + '\n';
             bookingLog += JSON.stringify(obj.bookings, null, '\t') + '\n';
-            libCalBooking[obj.name] = obj.bookings.map(lcObj => { return lcObj });
+            libCalBooking.push(obj.bookings);
           }); // end foreach obj
           fs.writeFile('logs/bookings.log', bookingLog, (error) => { if (error) throw error });
           // should also update the category log
-          return values;
+          return libCalBooking;
         }) // end Promise.all(promises)
       }); // end then / after libcal.getLibCalLists
       return bookingPromises;
@@ -85,10 +85,11 @@ function TheBusiness() {
 
   // Compare results of Campus and LibCal results
   Promise.all([campusPromises, libCalPromises]).then((values) => {
-    console.log(values)
+    //console.log(values)
     bookings = [];
     campusP = values[0];
-    libcalP = values[1];
+    libcalP = values[1].flat(1);
+    console.log(libcalP)
     cids = libcalP.categories[0].categories;
     // console.log(libcal.bookings)
     // for each LibCal category, match it with the campus shortname defined in campusIT.js
