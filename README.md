@@ -15,7 +15,17 @@ Looks up software bookings from the LibCal API and updates the membership of cor
 
 * `node app` - run once
 * `node app --listen` - run once, then listen on port 9000 (or port specified in campusIT.nodePort) for subsequent updates
-* let's use `npm run server` in production: it will add the `--listen` flag as well as `--name=software-checkout` so we can see which node process it is
+* PRODUCTION: `npm run server`: will add the `--listen` flag as well as `--name=software-checkout` so we can see which node process it is
+
+### Killing / restarting the app
+
+* `ps ax | grep node` - finds a list of all node processes, output like:
+```
+64175 s000  S      0:00.39 node app --listen --name=software-checkout
+64178 s000  S+     0:00.01 grep node
+```
+* `kill 64175` to kill the app. The --name flag exists only so we can kill the right process. Maybe in the future we'll have other node apps and that will be theasiest way to tell the difference.
+* restart will `npm run server` (as above)
 
 ## Helper files (not part of the app): 
 
