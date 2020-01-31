@@ -64,15 +64,17 @@ function TheBusiness() {
           // console.log(values)
           libCalBooking = [];
           // Log bookings data from LibCal API
-          let bookingLog = '\n=======================================\n'
+          let logOpener = '\n=======================================\n'
             + 'Updated: ' + moment().format('YYYY-MM-DD HH:mm:ss') + '\n';
+          let bookingLog = logOpener;
           values.forEach(obj => {
             bookingLog += '\n' + obj.cid + ' : ' + obj.name + '\n';
             bookingLog += JSON.stringify(obj.bookings, null, '\t') + '\n';
             libCalBooking.push(obj.bookings);
           }); // end foreach obj
+          let categoryLog = logOpener + JSON.stringify(values[0], null, '\t');
           fs.writeFile('logs/bookings.log', bookingLog, (error) => { if (error) throw error });
-          // should also update the category log
+          fs.writeFile('logs/categories.log', categoryLog, (error) => { if (error) throw error });
           libCalInfo = { categories: values[0].categories, bookings: libCalBooking.flat(1) }
           // console.log(libCalInfo)
           return libCalInfo;
