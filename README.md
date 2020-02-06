@@ -19,12 +19,7 @@ Looks up software bookings from the LibCal API and updates the membership of cor
 
 ### Killing / restarting the app
 
-* `ps ax | grep node` - finds a list of all node processes, output like:
-```
-64175 s000  S      0:00.39 node app --listen --name=software-checkout
-64178 s000  S+     0:00.01 grep node
-```
-* `kill 64175` to kill the app. The --name flag exists only so we can kill the right process. Maybe in the future we'll have other node apps and that will be theasiest way to tell the difference.
+* run `./killapp` -- finds the relevant process and kills it (only works if you used `npm run server` to start the app
 * restart will `npm run server` (as above)
 
 ## Helper files (not part of the app): 
