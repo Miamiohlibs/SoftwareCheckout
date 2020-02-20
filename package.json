@@ -4,7 +4,7 @@
   "description": "Connect LibCal checkouts with Active Directory groups",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest --watch",
     "start": "node app",
     "server": "node app --listen --name=software-checkout >> logs/program.log &",
     "dev": "nodemon app"
@@ -17,5 +17,11 @@
     "nodemon": "^2.0.2",
     "querystring": "^0.2.0",
     "simple-oauth2": "^3.2.0"
+  },
+  "devDependencies": {
+    "bufferutil": "^4.0.1",
+    "canvas": "^2.6.1",
+    "jest": "^25.1.0",
+    "utf-8-validate": "^5.0.2"
   }
 }

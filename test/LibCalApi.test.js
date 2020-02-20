@@ -22,3 +22,14 @@ describe('LibCalApi gets token', () => {
     expect(token.length).toBeGreaterThan(10);
   })
 })
+
+describe('LibCalApi can get a list of categories', () => {
+  it('should find at least one category', async () => {
+    const myApi = new LibCalApi(conf);
+    var token = await myApi.getToken();
+    var categories = await myApi.getOneLibCalList('categories');
+    expect(categories.length).toBeGreaterThan(0);
+    var obj = JSON.parse(categories);
+    expect(obj[0]).toHaveProperty('lid')
+  });
+})

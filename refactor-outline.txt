@@ -10,8 +10,7 @@ Update functionality:
 * get list of campus group assignments
   * get campus token
   * get list of campus permission groups
-  * foreach permission group, get list of current members
-
+  * foreach permission group, get list of current members  
 * get list of libCal group assignments
   * get libcal token
   * get list of libcal permission groups
@@ -19,3 +18,24 @@ Update functionality:
 
 * compare list, get diff
 * update campus lists based on diffs
+=====================================
+Classes: 
+
+LibCalApi: 
+√ initialize: 
+  √ load configs passed to it 
+  * verify that it has needed elements
+√ getToken
+√ make a libcal query
+* fetch list of groups ?
+* fetch list members
+
+ CampusApi:
+ * initialize: 
+   * load configs passed to it 
+   * verify that it has needed elements
+* getToken
+* fetch list of groups?
+* fetch list members
+* POST: add to list
+* DELETE: subtract from list 

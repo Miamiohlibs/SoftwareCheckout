@@ -1,3 +1,4 @@
+const query = require('../scripts/httpQuery')
 module.exports = class LibCalApi  {
   constructor(conf) {
     this.conf = conf;
@@ -21,6 +22,29 @@ module.exports = class LibCalApi  {
       return Promise.resolve(this.token);
     } catch (err) {
       console.error('Access Token Error:', err.message);
+    }
+  }
+
+  async getOneLibCalList (element, params='') {
+    const libCalOptions = this.conf;
+
+    // only get location: library software 
+    if (element == 'categories') { var id = '/' + this.conf.softwareLocation } else { id = '' }
+
+    this.conf.queryConfig.options.path = '/1.1/equipment/' + element + id;
+    this.conf.queryConfig.options.headers = { Authorization: 'Bearer ' + this.token }
+    if (element == 'bookings') {
+      this.conf.queryConfig.options.path += '?limit=100&lid=' + this.conf.softwareLocation + params;
+    }
+    console.log(this.conf.queryConfig.options.path, this.token)
+    // get a promise for each call
+    try { 
+      var promise = await query(this.conf.queryConfig).then((response) => {
+        return (response);
+      });
+      return promise;
+    } catch { 
+      console.error('failed to get libcal query')
     }
   }
 }
