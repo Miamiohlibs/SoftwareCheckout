@@ -1,6 +1,8 @@
 // Left Only:
 // given two arrays, A and B, return an array of values that appears ONLY in A
-module.exports = (a, b) => {
+module.exports = (a = [], b = []) => {
+  // console.debug('A', a);
+  // console.debug('B', b)
   return a.filter(x => !b.includes(x));
 }
 
