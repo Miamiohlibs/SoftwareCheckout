@@ -20,7 +20,7 @@ Looks up software bookings from the LibCal API and updates the membership of cor
 ### Killing / restarting the app
 
 * run `./killapp` -- finds the relevant process and kills it (only works if you used `npm run server` to start the app
-* `./killapp -r`: kill and restart (or use `npm run server` as above)
+* `./restart` or `./killapp -r`: kill and restart (or use `npm run server` as above)
 
 ## Helper files (not part of the app): 
 

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 DO_RESTART=false;
 while getopts ":r" opt; do
