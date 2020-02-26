@@ -24,6 +24,7 @@ Looks up software bookings from the LibCal API and updates the membership of cor
 
 ## Log files
 
+* `./lastlog.sh`: displays the output of the last update (from `logs/app.log`)
 * `logs/app.log`: logs console/STDOUT and STDERR when the app runs (chiefly at startup and whenever someone hits ths url)
 * `bookings.log`: most recent copy of the bookings API call from LibCal
 * `categories.log`: most recent copy of the categories API call from LibCal
