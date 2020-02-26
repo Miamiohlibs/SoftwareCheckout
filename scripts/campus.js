@@ -102,7 +102,6 @@ module.exports = {
     let response  = await query(campusOptions.queryConfig.convert);
     let data = JSON.parse(response);
     uniq = data.data.uid;
-    return {email: uniq, software: software} // this is a promise, not a regular JSON object
-    // return uniq; // this is a promise, not a string!
+    return uniq; // this is a promise, not a string!
   }
 }
