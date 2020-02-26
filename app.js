@@ -8,6 +8,8 @@ const libCal = require('./scripts/libCal.js');
 const campus = require('./scripts/campus');
 const utils = require('./scripts/utils');
 
+const startTime = new Date().getTime();
+
 const myArgs = process.argv.slice(2);
 if (myArgs.includes('--listen')) {
   const app = express();
@@ -44,7 +46,6 @@ function TheBusiness() {
             obj[campusLists.index[i]] = values[i];
           }
         }
-        fs.writeFile('logs/campusList.log', JSON.stringify(obj), (error) => { if (error) throw error });
         resolve(obj);
       })
         .catch((error) => {
@@ -81,7 +82,7 @@ function TheBusiness() {
           return libCalInfo;
         }) // end Promise.all(promises)
       })
-      .catch(err => { console.error('Failed to return booking promises:', err)}); // end then / after libcal.getLibCalLists
+        .catch(err => { console.error('Failed to return booking promises:', err) }); // end then / after libcal.getLibCalLists
       return bookingPromises;
     });
     resolve(topLevel)
@@ -92,6 +93,7 @@ function TheBusiness() {
   Promise.all([campusPromises, libCalPromises]).then((values) => {
     //console.log(values)
     bookings = [];
+    bookingPromises = [];
     campusP = values[0];
     libcalP = values[1];
     // console.log(libcalP);
@@ -107,50 +109,57 @@ function TheBusiness() {
       })
     });
     cids.forEach(element => {
-      console.log('get bookings for:',element)
-      // return books for that software category ("category" == "software package", etc); return only uniqueID, not full email
-      // so far, no limiting by checkout dates -- NEED TO DO THAT
-      // console.log('Libcal bookings', libcal.bookings)
+      var soft = element.campuscode;
+      bookingPromises[soft] = new Promise((resolve, reject) => {
+        // return books for that software category ("category" == "software package", etc); return only uniqueID, not full email
+        // so far, no limiting by checkout dates -- NEED TO DO THAT
+        // console.log('Libcal bookings', libcal.bookings)
 
-      // only look at bookings in the current category (cid)
-      let category_bookings = libcalP.bookings.filter(obj => { return obj.cid === element.cid });
-      // console.debug('Found these bookings for',element.name)
-      // console.debug(category_bookings);
+        // only look at bookings in the current category (cid)
+        let category_bookings = libcalP.bookings.filter(obj => { return obj.cid === element.cid });
 
-      // limit to current bookings (not future bookings)
-      let current_bookings = category_bookings.filter(obj => {
-        let toDate = Date.parse(obj.toDate);
-        let fromDate = Date.parse(obj.fromDate);
-        return ((Date.now() > fromDate) && (Date.now() < toDate))
-      });
-      // console.debug('Current bookings for ',element.name)
-      // console.debug(current_bookings);
+        // limit to current bookings (not future bookings)
+        let current_bookings = category_bookings.filter(obj => {
+          let toDate = Date.parse(obj.toDate);
+          let fromDate = Date.parse(obj.fromDate);
+          return ((Date.now() > fromDate) && (Date.now() < toDate))
+        });
 
-      // limit to confirmed bookings (not cancelled, etc)
-      let confirmed_bookings = current_bookings.filter(obj => { return obj.status === 'Confirmed' });
-      // console.debug('Confirmed bookings for ',element.name)
-      // console.debug(confirmed_bookings);
-      
-      // convert email addresses to uniqueIds
-      emailPromises = confirmed_bookings.map(item => { 
-        // console.debug('Confirmed',element.name,item.email);
-        return campus.convertEmailToUniq(item.email) 
+        // limit to confirmed bookings (not cancelled, etc)
+        let confirmed_bookings = current_bookings.filter(obj => { return obj.status === 'Confirmed' });
+        // convert email addresses to uniqueIds
+        emailPromises = confirmed_bookings.map(item => { return campus.convertEmailToUniq(item.email) });
+        Promise.all(emailPromises).then(data => {
+          bookings[element.campuscode] = data;
+          // console.log('Time elapsed:', new Date().getTime() - startTime);
+          // console.log('In process: ',bookings)
+        }).then( () => { 
+          resolve();
+        })
+        
+
       });
-      Promise.all(emailPromises).then(data => {
-        // console.debug('Bookings for', element.campuscode)
-        // console.debug(data)
-        bookings[element.campuscode] = data;
-        // console.debug('Bookings:')
-        // console.debug(bookings)
-        console.log('LibCal Bookings: ', bookings);
-        console.log('Campus Lists:', campusP)
-        campus.UpdateGroupMembers(bookings, campusP);
-      }).then(() => {
-        console.log('Finished update at:', moment().format('YYYY-MM-DD HH:mm:ss'));
-        utils.Divider();
-      }).catch(error => {
-        console.error(error);
-      });
-    })
-  });
+    });
+
+    Promise.all([ bookingPromises['photoshop'], bookingPromises['adobecc'], bookingPromises['illustrator'] ]).then(() => {
+      console.log('Time elapsed:', new Date().getTime() - startTime);
+      console.log('LibCal Bookings: ', bookings);
+      console.log('Campus Lists:', campusP)
+      campus.UpdateGroupMembers(bookings, campusP);
+    }).then(() => {
+      console.log('Finished update at:', moment().format('YYYY-MM-DD HH:mm:ss'));
+      utils.Divider();
+    });
+  }).catch((error) => {
+    console.error(error)
+  })
+}
+
+
+function wait(ms){
+  var start = new Date().getTime();
+  var end = start;
+  while(end < start + ms) {
+    end = new Date().getTime();
+ }
 }
