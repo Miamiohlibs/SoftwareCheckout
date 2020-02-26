@@ -8,6 +8,8 @@ const libCal = require('./scripts/libCal.js');
 const campus = require('./scripts/campus');
 const utils = require('./scripts/utils');
 
+const startTime = new Date().getTime();
+
 const myArgs = process.argv.slice(2);
 if (myArgs.includes('--listen')) {
   const app = express();
@@ -80,7 +82,7 @@ function TheBusiness() {
           return libCalInfo;
         }) // end Promise.all(promises)
       })
-      .catch(err => { console.error('Failed to return booking promises:', err)}); // end then / after libcal.getLibCalLists
+        .catch(err => { console.error('Failed to return booking promises:', err) }); // end then / after libcal.getLibCalLists
       return bookingPromises;
     });
     resolve(topLevel)
@@ -91,6 +93,7 @@ function TheBusiness() {
   Promise.all([campusPromises, libCalPromises]).then((values) => {
     //console.log(values)
     bookings = [];
+    bookingPromises = [];
     campusP = values[0];
     libcalP = values[1];
     // console.log(libcalP);
@@ -106,31 +109,40 @@ function TheBusiness() {
       })
     });
     cids.forEach(element => {
-      // return books for that software category ("category" == "software package", etc); return only uniqueID, not full email
-      // so far, no limiting by checkout dates -- NEED TO DO THAT
-      // console.log('Libcal bookings', libcal.bookings)
+      var soft = element.campuscode;
+      bookingPromises[soft] = new Promise((resolve, reject) => {
+        // return books for that software category ("category" == "software package", etc); return only uniqueID, not full email
+        // so far, no limiting by checkout dates -- NEED TO DO THAT
+        // console.log('Libcal bookings', libcal.bookings)
 
-      // only look at bookings in the current category (cid)
-      let category_bookings = libcalP.bookings.filter(obj => { return obj.cid === element.cid });
+        // only look at bookings in the current category (cid)
+        let category_bookings = libcalP.bookings.filter(obj => { return obj.cid === element.cid });
 
-      // limit to current bookings (not future bookings)
-      let current_bookings = category_bookings.filter(obj => {
-        let toDate = Date.parse(obj.toDate);
-        let fromDate = Date.parse(obj.fromDate);
-        return ((Date.now() > fromDate) && (Date.now() < toDate))
+        // limit to current bookings (not future bookings)
+        let current_bookings = category_bookings.filter(obj => {
+          let toDate = Date.parse(obj.toDate);
+          let fromDate = Date.parse(obj.fromDate);
+          return ((Date.now() > fromDate) && (Date.now() < toDate))
+        });
+
+        // limit to confirmed bookings (not cancelled, etc)
+        let confirmed_bookings = current_bookings.filter(obj => { return obj.status === 'Confirmed' });
+        // convert email addresses to uniqueIds
+        emailPromises = confirmed_bookings.map(item => { return campus.convertEmailToUniq(item.email) });
+        Promise.all(emailPromises).then(data => {
+          bookings[element.campuscode] = data;
+          // console.log('Time elapsed:', new Date().getTime() - startTime);
+          // console.log('In process: ',bookings)
+        }).then( () => { 
+          resolve();
+        })
+        
+
       });
-
-      // limit to confirmed bookings (not cancelled, etc)
-      let confirmed_bookings = current_bookings.filter(obj => { return obj.status === 'Confirmed' });
-
-      // convert email addresses to uniqueIds
-      emailPromises = confirmed_bookings.map(item => { return campus.convertEmailToUniq(item.email) });
-      Promise.all(emailPromises).then(data => {
-        bookings[element.campuscode] = data;
-      })
     });
 
-    Promise.all(emailPromises).then(() => {
+    Promise.all([ bookingPromises['photoshop'], bookingPromises['adobecc'], bookingPromises['illustrator'] ]).then(() => {
+      console.log('Time elapsed:', new Date().getTime() - startTime);
       console.log('LibCal Bookings: ', bookings);
       console.log('Campus Lists:', campusP)
       campus.UpdateGroupMembers(bookings, campusP);

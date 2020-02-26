@@ -20,7 +20,16 @@ Looks up software bookings from the LibCal API and updates the membership of cor
 ### Killing / restarting the app
 
 * run `./killapp` -- finds the relevant process and kills it (only works if you used `npm run server` to start the app
-* restart will `npm run server` (as above)
+* `./restart` or `./killapp -r`: kill and restart (or use `npm run server` as above)
+
+## Log files
+
+* `./lastlog.sh`: displays the output of the last update (from `logs/app.log`)
+* `logs/app.log`: logs console/STDOUT and STDERR when the app runs (chiefly at startup and whenever someone hits ths url)
+* `bookings.log`: most recent copy of the bookings API call from LibCal
+* `categories.log`: most recent copy of the categories API call from LibCal
+* `locations.log`: most recent copy of the locations API call from LibCal
+* `campusList.log`: results of the most recent pre-update request from campusIT (i.e. the log of what we based the updates on, not the result after updating. We might think about doing a check on this.)
 
 ## Helper files (not part of the app): 
 

@@ -1,4 +1,14 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+DO_RESTART=false;
+while getopts ":r" opt; do
+    case ${opt} in
+	r ) DO_RESTART=true;
+	    ;;
+	\? ) echo "Usage: killapp [-r]"
+	    ;;
+    esac
+done
 
 GREEN='\033[0;32m'
 RED='\033[0;31m'
@@ -12,4 +22,10 @@ reset
 echo $procline
 printf "${YELLOW}killing $proc ...${NC}\n"
 printf "${GREEN}done${NC}\n"
-printf "restart server with: ${CYAN}npm run server${NC}\n\n"
+
+if [ $DO_RESTART = true ]; then
+    printf "${YELLOW}\nRESTARTING SERVER...${NC}\n";
+    npm run server
+else 
+    printf "restart server with: ${CYAN}npm run server${NC}\n\n"
+fi
