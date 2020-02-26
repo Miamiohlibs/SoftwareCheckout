@@ -37,6 +37,7 @@ module.exports = {
       campusOptions.queryConfig.post.options.headers.Authorization = campusOptions.queryConfig.get.options.headers.Authorization
       campusOptions.queryConfig.post.data = { uniqueId: id }
       // console.log(campusOptions.queryConfig.post)
+      console.log('adding',id,'on',software);
       promises[id] = this.oneCampusUpdate(campusOptions.queryConfig.post);
     })
 
@@ -53,6 +54,7 @@ module.exports = {
       campusOptions.queryConfig.delete.options.path = campusOptions.queryConfig.delete.options.pathStem + 'dulb-patron' + software + '/' + id;
       campusOptions.queryConfig.delete.options.headers.Authorization = campusOptions.queryConfig.get.options.headers.Authorization
       promises[id] = this.oneCampusUpdate(campusOptions.queryConfig.delete);
+      console.log('deleting',id,'on',software);
     })
     utils.Divider();
     Promise.all(promises).then(values => {
@@ -93,13 +95,14 @@ module.exports = {
     return { promises: promises, index: index };
   },
 
-  convertEmailToUniq: async function (email) {
+  convertEmailToUniq: async function (email, software) {
     if (! email.includes('@')) { email += '@miamioh.edu'; }
     const escapedEmail = encodeURIComponent(email);
     campusOptions.queryConfig.convert.options.path = campusOptions.queryConfig.convert.options.pathStem + escapedEmail;
     let response  = await query(campusOptions.queryConfig.convert);
     let data = JSON.parse(response);
     uniq = data.data.uid;
-    return uniq; // this is a promise, not a string!
+    return {email: uniq, software: software} // this is a promise, not a regular JSON object
+    // return uniq; // this is a promise, not a string!
   }
 }
