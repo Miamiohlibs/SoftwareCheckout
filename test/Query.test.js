@@ -1,7 +1,7 @@
 const Query = require('../classes/Query');
 // const conf = require('../config/libCal.js');
 const bogusData = 'Everything you could want';
-const genericGet = {
+const genericJSON = {
   queryConf: {
     options: {
       hostname: 'randomuser.me',
@@ -87,4 +87,19 @@ describe('set config after blank setup', () => {
     expect(incremental).not.toHaveProperty('queryConf');
     expect(incremental).toHaveProperty('data');
   });
-})
+});
+
+describe('query execution (generic, unauthenticated)', () => { 
+  beforeEach(() => {
+    api = new Query(genericJSON.queryConf);
+  });
+  it('should return a JSON object', async () => {
+    const q = await api.execute();
+    const obj = await JSON.parse(q); 
+    expect(typeof q).toBe('string');
+
+    expect(typeof obj).toBe('object');
+    expect(obj).toHaveProperty('info');
+    expect(obj).toHaveProperty('results');
+  })
+});

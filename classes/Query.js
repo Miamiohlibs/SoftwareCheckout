@@ -19,8 +19,33 @@ module.exports = class Query {
     this.data = data;
   }
 
-  async execute () {
-
-  }
+  execute() {
+    return new Promise((resolve, reject) => {
+        // console.log('doRequest options: ', options)
+      const req = https.request(this.queryConf.options, (res) => {
+        // console.log(options);
+        res.setEncoding('utf8');
+        let responseBody = '';
+  
+        res.on('data', (chunk) => {
+          responseBody += chunk;
+        });
+  
+        res.on('end', () => {
+          // console.log('RESPONSE: ', responseBody)
+          resolve(responseBody);
+        });
+      });
+  
+      req.on('error', (err) => {
+        reject(err);
+      });
+  
+      if (this.data !== undefined) {
+        req.write(JSON.stringify(this.data));
+      }
+      req.end();
+    });
+  };
 
 }
