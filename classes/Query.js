@@ -1,13 +1,18 @@
 const https = require('https');
 
 module.exports = class Query {
-  constructor ( configs = null , data = null ) {
-    if (configs !== null ) { this.setConfigs(configs); }
+  constructor ( queryConf = null , auth = null, data = null ) {
+    if (queryConf !== null ) { this.setQueryConf(queryConf); }
+    if (auth !== null) { this.setAuth(auth); }
     if (data !== null ) { this.setData(data); }
   }
 
-  setConfigs(configs) {
-    this.config = configs;
+  setQueryConf(configs) {
+    this.queryConf = configs;
+  }
+
+  setAuth(auth) {
+    this.auth = auth;
   }
 
   setData(data) {
