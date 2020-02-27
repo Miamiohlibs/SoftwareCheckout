@@ -46,3 +46,22 @@ describe('Query configured initialization with data', () => {
     expect(configured).toHaveProperty('data', 'Everything you could want');
   });
 });
+
+describe('set config after blank setup', () => {
+  beforeEach(() => {
+    blank = new Query();
+  });
+
+  it('should take a config setting using setConfigs', () => {
+    blank.setConfigs(conf);
+    expect(blank).toHaveProperty('config');
+    expect(typeof blank.config.credentials).toBe('object');
+    expect(blank).not.toHaveProperty('data');
+  });
+
+  it('should take a data setting using setData', () => {
+    blank.setData(bogusData);
+    expect(blank).not.toHaveProperty('config');
+    expect(blank).toHaveProperty('data');
+  });
+})
