@@ -62,21 +62,29 @@ describe('Query configured initialization with data', () => {
   });
 });
 
-// describe('set config after blank setup', () => {
-//   beforeEach(() => {
-//     blank = new Query();
-//   });
+describe('set config after blank setup', () => {
+  beforeEach(() => {
+    incremental = new Query();
+  });
 
-//   it('should take a config setting using setConfigs', () => {
-//     blank.setConfigs(conf);
-//     expect(blank).toHaveProperty('config');
-//     expect(typeof blank.config.credentials).toBe('object');
-//     expect(blank).not.toHaveProperty('data');
-//   });
+  it('should take a config setting using setQueryConf', () => {
+    incremental.setQueryConf(genericGet.queryConf);
+    expect(incremental).toHaveProperty('queryConf');
+    expect(typeof incremental.queryConf).toBe('object');
+    expect(incremental).not.toHaveProperty('auth');
+    expect(incremental).not.toHaveProperty('data');
+  });
 
-//   it('should take a data setting using setData', () => {
-//     blank.setData(bogusData);
-//     expect(blank).not.toHaveProperty('config');
-//     expect(blank).toHaveProperty('data');
-//   });
-// })
+  it('should take a data setting using setAuth', () => {
+    incremental.setAuth({test:'authorization'});
+    expect(incremental).not.toHaveProperty('queryConf');
+    expect(incremental).toHaveProperty('auth');
+    expect(incremental).not.toHaveProperty('data');
+  });
+
+  it('should take a data setting using setData', () => {
+    incremental.setData(bogusData);
+    expect(incremental).not.toHaveProperty('queryConf');
+    expect(incremental).toHaveProperty('data');
+  });
+})
