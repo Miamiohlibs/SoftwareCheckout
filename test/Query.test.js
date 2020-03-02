@@ -1,6 +1,19 @@
 const Query = require('../classes/Query');
-// const conf = require('../config/libCal.js');
+const libCalConf = require('../config/libCal.js');
 const bogusData = 'Everything you could want';
+const genericGet = {
+  queryConf: {
+    options: {
+      hostname: 'jsonlint.com',
+      port: 443,
+      path: '/', //set at query time
+      method: 'GET',
+      headers: {
+        // set at query time
+      }
+    }
+  }
+}
 const genericJSON = {
   queryConf: {
     options: {
@@ -14,6 +27,21 @@ const genericJSON = {
     }
   }
 }
+const postJSON = {
+  queryConf: {
+    options: {
+      hostname: 'ulblwebt03.lib.miamioh.edu',
+      port: 443,
+      path: '/~irwinkr/json_in_json_out.php', //set at query time
+      method: 'POST',
+      headers: {
+        'Content-type': 'application/json'
+      }
+    }
+  }
+}
+
+const postData = { 'in': 'garbage' }
 
 beforeEach(() => {
   setQueryConfMock = jest.fn();
@@ -89,17 +117,34 @@ describe('set config after blank setup', () => {
   });
 });
 
-describe('query execution (generic, unauthenticated)', () => { 
+// describe('query execution (generic, unauthenticated)', () => { 
+//   beforeEach(() => {
+//     api = new Query(genericJSON.queryConf);
+//   });
+//   it('should return a JSON object', async () => {
+//     const q = await api.execute();
+//     const obj = await JSON.parse(q); 
+//     expect(typeof q).toBe('string');
+//     expect(typeof obj).toBe('object');
+//     expect(obj).toHaveProperty('info');
+//     expect(obj).toHaveProperty('results');
+//   })
+// });
+
+describe('query execution with post variables', () => { 
   beforeEach(() => {
-    api = new Query(genericJSON.queryConf);
+    api = new Query(postJSON.queryConf);
+    // console.log(api)
   });
   it('should return a JSON object', async () => {
     const q = await api.execute();
-    const obj = await JSON.parse(q); 
+    console.log(q)
+    // const obj = await JSON.parse(q); 
     expect(typeof q).toBe('string');
+    //expect(typeof obj).toBe('object');
+    // console.log(q);
+    // console.log(obj);
+    // expect(obj).toHaveProperty('test');
 
-    expect(typeof obj).toBe('object');
-    expect(obj).toHaveProperty('info');
-    expect(obj).toHaveProperty('results');
   })
 });
