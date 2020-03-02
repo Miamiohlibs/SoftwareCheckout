@@ -28,21 +28,18 @@ module.exports = class Query {
     this.data = data;
   }
 
-  execute(mode = 'json') {
-    if (mode == 'form') {
-      this.queryConf.options.headers = {
-        'Content-type': 'application/x-www-form-urlencoded'
-      }
-    } else {
-      this.queryConf.options.headers = {
-        'Content-type': 'application/json'
-      }
+  execute() {
+
+    this.queryConf.options.headers = {
+      // 'Content-type': 'application/json'
     }
+
     return new Promise((resolve, reject) => {
       const req = https.request(this.queryConf.options, (res) => {
         // console.log(options);
         res.setEncoding('utf8');
-        var responseBody;
+        var responseBody = '';
+        var i = 0;
 
         res.on('data', (chunk) => {
           responseBody += chunk;
@@ -59,17 +56,10 @@ module.exports = class Query {
       });
 
       if (this.data !== undefined) {
-        if (mode == 'form') { 
-          // console.log('doing string form');
-          let data = qs.stringify(this.data);
-          // console.log('Data:', data);
-          req.write(data);
-        } else {
-          // console.log('doing string JSON');
-          let data = JSON.stringify(this.data);
-          // console.log('Data:', data);
-          req.write(data);
-        }
+        // console.log('doing string JSON');
+        let data = JSON.stringify(this.data);
+        // console.log('Data:', data);
+        req.write(data);
       }
       req.end();
     });
