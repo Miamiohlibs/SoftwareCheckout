@@ -117,6 +117,7 @@ describe('set config after blank setup', () => {
   });
 });
 
+// Usually keep this commented out so we don't hit the randomuser.me site every time we test 
 // describe('query execution (generic, unauthenticated)', () => { 
 //   beforeEach(() => {
 //     api = new Query(genericJSON.queryConf);
@@ -134,17 +135,13 @@ describe('set config after blank setup', () => {
 describe('query execution with post variables', () => { 
   beforeEach(() => {
     api = new Query(postJSON.queryConf, null, postData);
-    // console.log(api)
   });
-  it('should return a JSON object', async () => {
+  it('should return a JSON object with ', async () => {
     const q = await api.execute();
     console.log(q)
     const obj = await JSON.parse(q); 
     expect(typeof q).toBe('string');
     expect(typeof obj).toBe('object'); 
-    // console.log(q);
-    // console.log(obj);
     expect(obj).toHaveProperty('out','garbage');
-
   })
 });
