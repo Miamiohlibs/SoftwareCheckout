@@ -1,13 +1,4 @@
-/*
-curl -X POST -d 'weather=rain&forecast=rain' -H "Content-Type: application/x-www-form-urlencoded"  https://ulblwebt03.lib.miamioh.edu/~irwinkr/post_json.php
-
-
-curl -X POST -d '{"weather":"rain"}' -H "Content-Type: application/json"  https://ulblwebt03.lib.miamioh.edu/~irwinkr/post_json.php
-
-*/
-
 const https = require('https');
-const qs = require('querystring')
 
 module.exports = class Query {
   constructor(queryConf = null, auth = null, data = null) {
