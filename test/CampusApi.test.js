@@ -13,7 +13,10 @@ describe('Campus IT API', () => {
     expect(api.conf).toHaveProperty('software');
   });
 
-  // it('should be able to get a token', () => {
-
-  // });
+  it('should be able to get a token', async () => {
+    await api.getToken();
+    expect(typeof api.token).toBe('string');
+    expect(api.token.length).toBeGreaterThan(10);
+    // expect(token).toEqual(api.token);
+  });
 });
