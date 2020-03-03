@@ -26,5 +26,19 @@ describe('Campus IT API', () => {
     expect(lists).toBeInstanceOf(Array);
     expect(lists).toContain('adobecc');
     expect(lists).toEqual(api.campusListNames);
+  });
+
+  it('should use getOneList to get the contents of a single list', async () => {
+    const token = await api.getToken();
+    let values = await api.getOneList('adobecc');
+    expect(values).toBeInstanceOf(Array);
   })
+
+
+  // it('should use get the lists', () => {
+  //   let listObj = api.getListValues();
+  //   expect(typeof listObj).toBe('object');
+  //   expect(listObj).toHaveProperty('adobecc');
+  //   expect(listObj.adobecc).toBeInstanceOf(Array);
+  // })
 });

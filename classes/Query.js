@@ -20,14 +20,10 @@ module.exports = class Query {
   }
 
   execute() {
-
-    this.queryConf.options.headers = {
-      // 'Content-type': 'application/json'
-    }
-
     return new Promise((resolve, reject) => {
-      const req = https.request(this.queryConf.options, (res) => {
-        // console.log(options);
+      let options = this.queryConf.options;
+      const req = https.request(options, (res) => {
+        //  console.log(options);
         res.setEncoding('utf8');
         var responseBody = '';
         var i = 0;
@@ -37,7 +33,7 @@ module.exports = class Query {
         });
 
         res.on('end', () => {
-          // console.log('RESPONSE: ', responseBody)
+          //  console.log('RESPONSE: ', responseBody)
           resolve(responseBody);
         });
       });
