@@ -1,5 +1,7 @@
 const CampusApi = require('../classes/CampusApi');
 const campusConf = require('../config/campusIT');
+const sampleCampusListJson = '[{"uniqueId":"yarnete","affiliationCode":"sta","directories":{"Database":"member","GoogleApps":"member","ActiveDirectory":"member"}},{"uniqueId":"irwinkr","affiliationCode":"sta","directories":{"Database":"member","GoogleApps":"member","ActiveDirectory":"member"}}]';
+
 
 describe('Campus IT API', () => {
 
@@ -28,17 +30,23 @@ describe('Campus IT API', () => {
     expect(lists).toEqual(api.campusListNames);
   });
 
-  it('should use getOneList to get the contents of a single list', async () => {
-    const token = await api.getToken();
-    let values = await api.getOneList('adobecc');
-    expect(values).toBeInstanceOf(Array);
-  })
 
+  it('should use justUniqueIds to get an array of users', () => {
+    obj = JSON.parse(sampleCampusListJson);    
+    // console.log(obj)
+    var arr = api.justUniqueIds(obj);
+    expect(arr).toBeInstanceOf(Array);
+    expect(arr.length).toEqual(obj.length);
+    expect(typeof arr[0]).toBe('string');
+    expect(arr[0]).toBe('yarnete');
+  });
 
-  // it('should use get the lists', () => {
-  //   let listObj = api.getListValues();
+  // it('should use get multiple lists', () => {
+  //   let listObj = api.getMultipleLists();
   //   expect(typeof listObj).toBe('object');
   //   expect(listObj).toHaveProperty('adobecc');
+  //   expect(listObj).toHaveProperty('photoshop');
   //   expect(listObj.adobecc).toBeInstanceOf(Array);
+  //   expect(listObj.photoshop).toBeInstanceOf(Array);
   // })
 });

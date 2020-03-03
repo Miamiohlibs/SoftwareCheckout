@@ -19,10 +19,10 @@ module.exports = class CampusApi {
     return this.token;
   }
 
-  async getListValues() {
+  async getMultipleLists() {
     obj = {};
-    this.campusListNames.foreEach(id => {
-
+    this.campusListNames.forEach(async (id) => {
+      obj[id] = await this.getOneList(id);
     });
     return obj;
   }
@@ -33,12 +33,22 @@ module.exports = class CampusApi {
     // console.debug(this.conf.queryConfig.get.options)
     let query = new Query(this.conf.queryConfig.get);
     let values = await query.execute();
+    console.log(typeof JSON.parse(values))
     if (this.isJson(values)) {
-      return JSON.parse(values);
+      let obj = JSON.parse(values);
+      return this.justUniqueIds(obj);
     } else {
       return "failed";
     }
-    console.log('Heres what we got back:',values)
+    // console.debug('Heres what we got back:',values)
+  }
+
+  justUniqueIds(json) {
+    let ids = [];
+    json.forEach(entry => {
+      ids.push(entry.uniqueId);
+    });
+    return ids;
   }
 
   isJson(str) {
