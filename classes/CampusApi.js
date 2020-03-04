@@ -21,20 +21,20 @@ module.exports = class CampusApi {
   }
 
   async getMultipleLists() {
-    if (api.token === undefined) { 
-      await api.getToken();
+    if (this.token === undefined) { 
+      await this.getToken();
     }
     let itemList = {}
     await this.asyncForEach(this.campusListNames, async item => {
-      let response = await api.getOneList(item);
+      let response = await this.getOneList(item);
       itemList[item] = response;
     });
     return itemList;
   }
 
   async getOneList(listName) {
-    if (api.token === undefined) { 
-      await api.getToken();
+    if (this.token === undefined) { 
+      await this.getToken();
     }
     this.conf.queryConfig.get.options.headers.Authorization = this.token;
     this.conf.queryConfig.get.options.path = this.conf.queryConfig.get.options.pathStem + 'dulb-patron' + listName;
@@ -60,8 +60,8 @@ module.exports = class CampusApi {
   }
 
   async convertEmailToUniq (email) {
-    if (api.token === undefined) { 
-      await api.getToken();
+    if (this.token === undefined) { 
+      await this.getToken();
     }
     if (! email.includes('@')) { email += '@miamioh.edu'; }
     const escapedEmail = encodeURIComponent(email);
