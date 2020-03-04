@@ -6,7 +6,7 @@ const CampusApi = require('./classes/CampusApi');
 const campusConf = require('./config/campusIT');
 
 // comment this line out to suppress debug messages
-console.debug = ()=>{};
+// console.debug = ()=>{};
 
 (async () => { 
   const startTime = new Date().getTime();
@@ -28,4 +28,14 @@ console.debug = ()=>{};
   } catch {
     console.error('Unable to get Campus Token');
   }
+
+  // Get Campus Lists
+  try {
+    
+    let campusLists = await campusApi.getMultipleLists();
+    console.debug(campusLists);
+  } catch (err) {
+    console.error('Error getting campus lists:', err);
+  }
+
 })();
