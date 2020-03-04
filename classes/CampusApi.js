@@ -59,6 +59,20 @@ module.exports = class CampusApi {
     return ids;
   }
 
+  async convertEmailToUniq (email) {
+    if (api.token === undefined) { 
+      await api.getToken();
+    }
+    if (! email.includes('@')) { email += '@miamioh.edu'; }
+    const escapedEmail = encodeURIComponent(email);
+    this.conf.queryConfig.convert.options.path = this.conf.queryConfig.convert.options.pathStem + escapedEmail;
+    let query = new Query(this.conf.queryConfig.convert);
+    let response = await query.execute();
+    // console.log('Convert response:',response);a
+    let data = JSON.parse(response);
+    let uniq = data.data.uid;
+    return uniq; 
+  }
 
   /* Utility functions */
 

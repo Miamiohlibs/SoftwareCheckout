@@ -54,4 +54,15 @@ describe('Campus IT API', () => {
       console.log(err)
     }
   })
+
+  it('should be able to convert an email alias to a Miami uniqueId', async () => {
+    try { 
+      let alias = 'jerry.yarnetsky@miamioh.edu';
+      let uniq = await api.convertEmailToUniq(alias);
+      expect(uniq).toBe('yarnete');
+    } catch (err) {
+      console.error(err);
+      expect(true).toBe(false);
+    }
+  });
 });
