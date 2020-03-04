@@ -7,6 +7,7 @@ describe('Campus IT API', () => {
 
   beforeEach(() => {
     api = new CampusApi(campusConf);
+    jest.setTimeout(30000);
   });
 
   it('should read the config file on initialization', () => {
@@ -41,12 +42,16 @@ describe('Campus IT API', () => {
     expect(arr[0]).toBe('yarnete');
   });
 
-  // it('should use get multiple lists', () => {
-  //   let listObj = api.getMultipleLists();
-  //   expect(typeof listObj).toBe('object');
-  //   expect(listObj).toHaveProperty('adobecc');
-  //   expect(listObj).toHaveProperty('photoshop');
-  //   expect(listObj.adobecc).toBeInstanceOf(Array);
-  //   expect(listObj.photoshop).toBeInstanceOf(Array);
-  // })
+  it('should use get multiple lists', async () => {
+    try {
+      let listObj = await api.getMultipleLists();
+      expect(typeof listObj).toBe('object');
+      expect(listObj).toHaveProperty('adobecc');
+      expect(listObj).toHaveProperty('photoshop');
+      expect(listObj.adobecc).toBeInstanceOf(Array);
+      expect(listObj.photoshop).toBeInstanceOf(Array);
+    } catch (err) { 
+      console.log(err)
+    }
+  })
 });

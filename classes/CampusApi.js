@@ -16,24 +16,32 @@ module.exports = class CampusApi {
     let response = await api.execute();
     let tokenObj = JSON.parse(response);
     this.token = tokenObj.data.token;
+    // console.debug('got campus token:',this.token)
     return this.token;
   }
 
   async getMultipleLists() {
-    obj = {};
-    this.campusListNames.forEach(async (id) => {
-      obj[id] = await this.getOneList(id);
+    if (api.token === undefined) { 
+      await api.getToken();
+    }
+    let itemList = {}
+    await this.asyncForEach(this.campusListNames, async item => {
+      let response = await api.getOneList(item);
+      itemList[item] = response;
     });
-    return obj;
+    return itemList;
   }
 
   async getOneList(listName) {
+    if (api.token === undefined) { 
+      await api.getToken();
+    }
     this.conf.queryConfig.get.options.headers.Authorization = this.token;
     this.conf.queryConfig.get.options.path = this.conf.queryConfig.get.options.pathStem + 'dulb-patron' + listName;
     // console.debug(this.conf.queryConfig.get.options)
     let query = new Query(this.conf.queryConfig.get);
     let values = await query.execute();
-    console.log(typeof JSON.parse(values))
+    // console.debug(typeof JSON.parse(values))
     if (this.isJson(values)) {
       let obj = JSON.parse(values);
       return this.justUniqueIds(obj);
@@ -51,6 +59,9 @@ module.exports = class CampusApi {
     return ids;
   }
 
+
+  /* Utility functions */
+
   isJson(str) {
     try {
       JSON.parse(str);
@@ -59,6 +70,17 @@ module.exports = class CampusApi {
     }
     return true;
   }
+
+
+// asyncForEach 
+// from: https://codeburst.io/javascript-async-await-with-foreach-b6ba62bbf404
+// by: Sebastien Chopin
+
+async asyncForEach(array, callback) {
+  for (let index = 0; index < array.length; index++) {
+    await callback(array[index], index, array);
+  }
 }
 
-// curl https://community.miamioh.edu/directory-accounts/api/members/dulb-patronadobecc
+
+}
