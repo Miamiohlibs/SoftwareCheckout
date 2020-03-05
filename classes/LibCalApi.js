@@ -1,11 +1,11 @@
 const query = require('../scripts/httpQuery')
-module.exports = class LibCalApi  {
+module.exports = class LibCalApi {
   constructor(conf) {
     this.conf = conf;
-    const required = ['credentials','queryConfig'];
+    const required = ['credentials', 'queryConfig'];
     required.forEach(element => {
-      if (! this.conf.hasOwnProperty(element)) {
-        throw new Error('LibCalApi missing required property: '+element);
+      if (!this.conf.hasOwnProperty(element)) {
+        throw new Error('LibCalApi missing required property: ' + element);
       }
     });
   }
@@ -25,7 +25,7 @@ module.exports = class LibCalApi  {
     }
   }
 
-  async getOneLibCalList (element, params='') {
+  async getOneLibCalList(element, params = '') {
     const libCalOptions = this.conf;
 
     // only get location: library software 
@@ -38,13 +38,47 @@ module.exports = class LibCalApi  {
     }
     console.log(this.conf.queryConfig.options.path, this.token)
     // get a promise for each call
-    try { 
+    try {
       var promise = await query(this.conf.queryConfig).then((response) => {
         return (response);
       });
       return promise;
-    } catch { 
+    } catch {
       console.error('failed to get libcal query')
     }
   }
+
+  async getLibCalLists() {
+    try {
+      let categories = await this.getOneLibCalList('categories');
+      let cats = JSON.parse(categories);
+      console.log()
+      const allLists = [];
+      await this.asyncForEach(cats[0].categories, async item => {
+        // console.log(item);
+        let response = await this.getOneLibCalList('bookings', "&cid=" + item.cid);
+        let parsed = JSON.parse(response);
+        let obj = { cid: item.cid, name: item.name, bookings: parsed} //, categories: categories }
+        // console.log('ID:',item.cid)
+        // response[item.cid] = obj;
+        allLists.push(obj)
+      });
+      return allLists;
+    } catch (err) {
+      console.log('Error getting LibCal lists:', err);
+    }
+
+  }
+
+  // asyncForEach 
+  // from: https://codeburst.io/javascript-async-await-with-foreach-b6ba62bbf404
+  // by: Sebastien Chopin
+
+  async asyncForEach(array, callback) {
+    for (let index = 0; index < array.length; index++) {
+      await callback(array[index], index, array);
+    }
+  }
+
 }
+

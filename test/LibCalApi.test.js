@@ -23,7 +23,7 @@ describe('LibCalApi gets token', () => {
   })
 })
 
-describe('LibCalApi can get a list of categories', () => {
+describe('LibCalApi can get a lists of categories', () => {
   it('should find at least one category', async () => {
     const myApi = new LibCalApi(conf);
     var token = await myApi.getToken();
@@ -32,4 +32,17 @@ describe('LibCalApi can get a list of categories', () => {
     var obj = JSON.parse(categories);
     expect(obj[0]).toHaveProperty('lid')
   });
-})
+});
+
+describe('LibCalApi can get the booking lists', async () => {
+  it('should bring back an array of software and bookings info on getLibCalLists()', async () => {
+    const myApi = new LibCalApi(conf);
+    await myApi.getToken();
+    let bookings = await myApi.getLibCalLists();
+    expect(bookings).toBeInstanceOf(Array);
+    expect(bookings[0]).toHaveProperty('cid');
+    expect(bookings[0]).toHaveProperty('name');
+    expect(bookings[0]).toHaveProperty('bookings');
+  });
+});
+
