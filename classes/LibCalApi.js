@@ -58,11 +58,12 @@ module.exports = class LibCalApi {
         // console.log(item);
         let response = await this.getOneLibCalList('bookings', "&cid=" + item.cid);
         let parsed = JSON.parse(response);
-        let obj = { cid: item.cid, name: item.name, bookings: parsed} //, categories: categories }
+        let obj = { cid: item.cid, name: item.name, bookings: parsed } //, categories: categories }
         // console.log('ID:',item.cid)
         // response[item.cid] = obj;
         allLists.push(obj)
       });
+      // this.lcSoftware = allLists;
       return allLists;
     } catch (err) {
       console.log('Error getting LibCal lists:', err);
@@ -70,6 +71,19 @@ module.exports = class LibCalApi {
 
   }
 
+  mapLibCal2CampusCodes(cids, crosswalk) {
+    // adds a .campusCode property to each LibCal cid element
+    // note: the LibCal.name must exactly match the .name property defined in configs/campusIT.js
+    // crosswalk should be the .software property of the campusIt configuration, containing a name and shortName
+    cids.forEach(libCalElement => {
+      crosswalk.map(item => {
+        if (libCalElement.name == item.name) {
+          libCalElement.campusCode = item.shortName;
+        }
+      })
+    });
+    return cids;
+  }
   // asyncForEach 
   // from: https://codeburst.io/javascript-async-await-with-foreach-b6ba62bbf404
   // by: Sebastien Chopin

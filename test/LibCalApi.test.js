@@ -1,6 +1,8 @@
 const LibCalApi = require('../classes/LibCalApi');
 const conf = require('../config/libCal');
-const badConf = conf;
+const sampleBookings = require('./sample-data/libCalBookingsSample');
+// const badConf = conf;
+const campusConf = require('../config/campusIT');
 
 describe('LibCalApi initialization', () => {
   it('should have some basic variables set on initialization', () => {
@@ -34,15 +36,30 @@ describe('LibCalApi can get a lists of categories', () => {
   });
 });
 
-describe('LibCalApi can get the booking lists', async () => {
+describe('LibCalApi can get the booking lists', () => {
+
+  beforeEach( () => {
+    myApi = new LibCalApi(conf);
+  });
+
   it('should bring back an array of software and bookings info on getLibCalLists()', async () => {
-    const myApi = new LibCalApi(conf);
     await myApi.getToken();
     let bookings = await myApi.getLibCalLists();
     expect(bookings).toBeInstanceOf(Array);
     expect(bookings[0]).toHaveProperty('cid');
     expect(bookings[0]).toHaveProperty('name');
     expect(bookings[0]).toHaveProperty('bookings');
+  });
+
+  it('should add a campusCode to each LibCal category', () => {
+    let softwareWithCodes = myApi.mapLibCal2CampusCodes(sampleBookings, campusConf.software);
+    expect(softwareWithCodes[0]).toHaveProperty('campusCode');
+    expect(softwareWithCodes[0].campusCode).toBe('photoshop');
+  });
+
+  it('should correctly read a bookings array', () => {
+    // let softwareWithCodes = myApi.mapLibCal2CampusCodes(sampleBookings, campusConf.software);
+    // let bookingsBrief = myApi.
   });
 });
 
