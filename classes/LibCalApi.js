@@ -84,11 +84,31 @@ module.exports = class LibCalApi {
     });
     return cids;
   }
-  // asyncForEach 
-  // from: https://codeburst.io/javascript-async-await-with-foreach-b6ba62bbf404
-  // by: Sebastien Chopin
+
+  getCurrentLibCalBookings(bookings) {
+    // checks the software array for bookings that are current (active as of now) and status=confirmed
+    // returns an array with a subset of booked software
+
+
+    // filter to current 
+    let currentBookings = bookings.filter(obj => {
+      let toDate = Date.parse(obj.toDate);
+      let fromDate = Date.parse(obj.fromDate);
+      return ((Date.now() > fromDate) && (Date.now() < toDate))
+    });
+    // limit to confirmed bookings (not cancelled, etc)
+    return currentBookings.filter(obj => { return obj.status === 'Confirmed' });
+
+
+  }
+
+
+
 
   async asyncForEach(array, callback) {
+    // asyncForEach 
+    // from: https://codeburst.io/javascript-async-await-with-foreach-b6ba62bbf404
+    // by: Sebastien Chopin
     for (let index = 0; index < array.length; index++) {
       await callback(array[index], index, array);
     }
