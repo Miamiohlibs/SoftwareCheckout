@@ -8,7 +8,7 @@ const campusConf = require('./config/campusIT');
 // comment this line out to suppress debug messages
 // console.debug = ()=>{};
 
-(async () => { 
+(async () => {
   const startTime = new Date().getTime();
 
   // Get LibCal Token
@@ -39,8 +39,9 @@ const campusConf = require('./config/campusIT');
 
   // Get LibCal Lists
   try {
-    let bookings = await lcApi.getLibCalLists();
-    console.log(bookings);
+    let lcSoftware = await lcApi.getLibCalLists();
+    lcSoftware = lcApi.mapLibCal2CampusCodes(lcSoftware, campusConf.software)
+    console.debug(JSON.stringify(lcSoftware, null, 4));
   } catch (err) {
     console.error('Error getting LibCal lists:', err);
   }
