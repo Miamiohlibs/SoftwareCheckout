@@ -29,13 +29,15 @@ const campusConf = require('./config/campusIT');
     console.error('Unable to get Campus Token');
   }
 
-  // Get Campus Lists
-  try {
-    
-    let campusLists = await campusApi.getMultipleLists();
-    console.debug(campusLists);
-  } catch (err) {
-    console.error('Error getting campus lists:', err);
-  }
+  // // Get Campus Lists
+  // try {
+  //   let campusLists = await campusApi.getMultipleLists();
+  //   console.debug(campusLists);
+  // } catch (err) {
+  //   console.error('Error getting campus lists:', err);
+  // }
 
+  // Get LibCal Lists
+  let bookings = await lcApi.getLibCalLists();
+  console.log(bookings)
 })();
