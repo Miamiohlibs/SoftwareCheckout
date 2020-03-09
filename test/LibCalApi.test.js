@@ -3,6 +3,7 @@ const conf = require('../config/libCal');
 const sampleBookings = require('./sample-data/libCalBookingsSample');
 // const badConf = conf;
 const campusConf = require('../config/campusIT');
+const dynamicDatesBookings = require('./sample-data/libCalBookingsSampleDynamic');
 
 describe('LibCalApi initialization', () => {
   it('should have some basic variables set on initialization', () => {
@@ -57,9 +58,10 @@ describe('LibCalApi can get the booking lists', () => {
     expect(softwareWithCodes[0].campusCode).toBe('photoshop');
   });
 
-  it('should correctly read a bookings array', () => {
-    // let softwareWithCodes = myApi.mapLibCal2CampusCodes(sampleBookings, campusConf.software);
-    // let bookingsBrief = myApi.
+  it('should correctly filter a bookings array for current, confirmed requests', () => {
+    let currentConfirmed = myApi.getCurrentLibCalBookings(dynamicDatesBookings);
+    expect(currentConfirmed.length).toBe(1);
+    expect(currentConfirmed[0].bookId).toBe('csLVDpYHB');
   });
 });
 
