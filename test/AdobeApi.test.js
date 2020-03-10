@@ -23,7 +23,7 @@ describe('ReadConf', () => {
 describe('getToken', () => {
   it('should get a token based on the real config', () => {
     const api = new AdobeUserMgmtApi(realConf);
-    const token = api.getToken();
+    const token = api.getJWT();
     expect(typeof token).toBe('string');
     expect(token.length).toBeGreaterThan(100);
   });

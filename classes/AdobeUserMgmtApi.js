@@ -10,7 +10,7 @@ module.exports = class AdobeUserMgmtApi {
     return this.conf.values.filter(item => { return item.key == key })[0].value;
   }
 
-  getToken () {
+  getJWT () {
     const aud = this.readConf('API_KEY');
     const iss = this.readConf('IMS_ORG');
     const sub = this.readConf('TECHNICAL_ACCOUNT_ID');
