@@ -74,6 +74,15 @@ module.exports = class CampusApi {
     return uniq; 
   }
 
+  async convertMultipleEmails(arr) {
+    let output = arr.map(email => this.convertEmailToUniq(email));
+    // console.log(output);
+    let result = Promise.all(output).then(res => { 
+      // console.log('now resolved:', res);
+      return res; 
+    });
+    return result;
+  }
   /* Utility functions */
 
   isJson(str) {
