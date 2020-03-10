@@ -4,6 +4,7 @@ const sampleBookings = require('./sample-data/libCalBookingsSample');
 // const badConf = conf;
 const campusConf = require('../config/campusIT');
 const dynamicDatesBookings = require('./sample-data/libCalBookingsSampleDynamic');
+const bookingObject = require('./sample-data/bookingObject');
 
 describe('LibCalApi initialization', () => {
   it('should have some basic variables set on initialization', () => {
@@ -39,7 +40,7 @@ describe('LibCalApi can get a lists of categories', () => {
 
 describe('LibCalApi can get the booking lists', () => {
 
-  beforeEach( () => {
+  beforeEach(() => {
     myApi = new LibCalApi(conf);
   });
 
@@ -62,6 +63,13 @@ describe('LibCalApi can get the booking lists', () => {
     let currentConfirmed = myApi.getCurrentLibCalBookings(dynamicDatesBookings);
     expect(currentConfirmed.length).toBe(1);
     expect(currentConfirmed[0].bookId).toBe('csLVDpYHB');
+  });
+
+  it('should be return just email addresses from a booking array', () => {
+    let result = myApi.getEmailsFromBookings(bookingObject);
+    expect(result).toBeInstanceOf(Array);
+    expect(result.length).toBe(3);
+    expect(result[0]).toBe('jerry.yarnetsky@miamioh.edu')
   });
 });
 

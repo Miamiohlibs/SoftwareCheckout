@@ -102,7 +102,9 @@ module.exports = class LibCalApi {
 
   }
 
-
+  getEmailsFromBookings(bookings) {
+    return bookings.map(item => { return item.email });
+  }
 
 
   async asyncForEach(array, callback) {
