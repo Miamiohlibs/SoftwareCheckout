@@ -1,4 +1,5 @@
 const sampleConf = require('./sample-data/adobeConfSample');
+const realConf = require('../config/adobe');
 const AdobeUserMgmtApi = require('../classes/AdobeUserMgmtApi');
 
 describe('Initialization', () => {
@@ -18,3 +19,12 @@ describe('ReadConf', () => {
     expect(apiKey).toBe('my_api_key');
   })
 });
+
+describe('getToken', () => {
+  it('should get a token based on the real config', () => {
+    const api = new AdobeUserMgmtApi(realConf);
+    const token = api.getToken();
+    expect(typeof token).toBe('string');
+    expect(token.length).toBeGreaterThan(100);
+  });
+})
