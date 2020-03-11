@@ -12,6 +12,7 @@
   "author": "Ken Irwin",
   "license": "MIT",
   "dependencies": {
+    "@adobe/jwt-auth": "^0.3.1",
     "async": "^3.2.0",
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",

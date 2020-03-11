@@ -4,6 +4,10 @@ const LibCalApi = require('./classes/LibCalApi');
 const libCalConf = require('./config/libCal');
 const CampusApi = require('./classes/CampusApi');
 const campusConf = require('./config/campusIT');
+const adobeConf = require('./config/adobe').credentials;
+// const AdobeApi = require('./classes/AdobeUserMgmtApi');
+const adodbeAuth = require('@adobe/jwt-auth');
+const fs = require('fs');
 const async = require('async');
 
 // comment this line out to suppress debug messages
@@ -29,6 +33,17 @@ const async = require('async');
   } catch {
     console.error('Unable to get Campus Token');
   }
+
+  // get Adobe Token
+  try {
+    adobeConf.privateKey = fs.readFileSync('./certs/private.key', 'utf8');
+    let tokenResponse = await adodbeAuth(adobeConf);
+    let adobeToken = tokenResponse.access_token;
+    console.log('Adobe token:',adobeToken);
+  } catch (err) {
+    console.error('Unable to get Adobe token:',err)
+  }
+
 
   // Get Campus Lists
   try {
