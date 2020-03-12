@@ -1,31 +1,20 @@
-const jwt = require('jsonwebtoken');
-const moment = require('moment');
+const Query = require('./Query');
+const jwtAuth = require('@adobe/jwt-auth');
+const path = require('path');
+const fs = require('fs');
 
 module.exports = class AdobeUserMgmtApi {
-  constructor (conf) {
-    this.conf = conf;
-  } 
-
-  readConf (key) {
-    return this.conf.values.filter(item => { return item.key == key })[0].value;
+  constructor(conf) {
+    this.credentials = conf.credentials;
+    this.queryConf = conf.queryConf;
+    this.credentials.privateKey = fs.readFileSync(path.join(__dirname, conf.certs.privateKeyFile), 'utf8');
+    // this.credentials.privateKey = this.privateKey;
   }
 
-  getJWT () {
-    const aud = this.readConf('API_KEY');
-    const iss = this.readConf('IMS_ORG');
-    const sub = this.readConf('TECHNICAL_ACCOUNT_ID');
-    const exp = parseInt(moment().add(15, 'minutes').format('X'));
-    const secret  = this.readConf('CLIENT_SECRET');
-    
-    const payload = {
-      exp: exp,
-      iss: iss,
-      sub: sub,
-      "https://ims-na1.adobelogin.com/s/meta_scope": true,
-      aud: aud
-    }
-    
-    let token = jwt.sign(payload,secret);
-    return token;
+  async getToken() {
+    let tokenResponse = await jwtAuth(this.credentials);
+    this.accessToken = tokenResponse.access_token;
+    return tokenResponse.access_token;
+    // this.accessToken = tokenResponse;
   }
- }
+}
