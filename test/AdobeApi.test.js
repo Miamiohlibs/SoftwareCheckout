@@ -4,7 +4,7 @@ const AdobeUserMgmtApi = require('../classes/AdobeUserMgmtApi');
 
 describe('Initialization', () => {
 
-  beforeEach( () => {
+  beforeEach(() => {
     api = new AdobeUserMgmtApi(realConf);
   });
 
@@ -25,30 +25,31 @@ describe('Queries', () => {
     await api.getToken();
   });
 
-  it('should get the access token', () => { 
+  it('should get the access token', () => {
     expect(api).toHaveProperty('accessToken');
     expect(typeof api.accessToken).toBe('string');
   });
 
   it('should be able to add queryConfigs using querySetup() with extra headers', () => {
-    var genericOpts =  api.queryConf.generic.options; 
+    var genericOpts = api.queryConf.generic.options;
     console.log('genericOpts', genericOpts)
-    const originalHeadersLength = Object.keys(genericOpts.headers).length; 
-    api.querySetup('generic', {fake: 'aardvark', bogus: 'pangolin', headers: { artificial: 'imaginary'}} );
-    expect(api.currOpts).toHaveProperty('fake','aardvark');
-    expect(api.currOpts).toHaveProperty('bogus','pangolin');
-    expect(api.currOpts.headers).toHaveProperty('artificial','imaginary');
+    const originalHeadersLength = Object.keys(genericOpts.headers).length;
+    api.querySetup('generic', { fake: 'aardvark', bogus: 'pangolin', headers: { artificial: 'imaginary' } });
+    expect(api.currOpts).toHaveProperty('fake', 'aardvark');
+    expect(api.currOpts).toHaveProperty('bogus', 'pangolin');
+    expect(api.currOpts.headers).toHaveProperty('artificial', 'imaginary');
     expect(Object.keys(api.currOpts.headers).length).toEqual(originalHeadersLength + 1);
   })
 
   it('should be able to add queryConfigs using querySetup() with NO extra headers', () => {
-    var genericOpts =  api.queryConf.generic.options; 
+    var genericOpts = api.queryConf.generic.options;
     // console.log('genericOpts', api.queryConf.generic.options);
-    const originalHeadersLength = Object.keys(genericOpts.headers).length; 
-    api.querySetup('generic', {fake: 'aardvark', bogus: 'pangolin'} );
-    expect(api.currOpts).toHaveProperty('fake','aardvark');
-    expect(api.currOpts).toHaveProperty('bogus','pangolin');
+    const originalHeadersLength = Object.keys(genericOpts.headers).length;
+    api.querySetup('generic', { fake: 'aardvark', bogus: 'pangolin' });
+    expect(api.currOpts).toHaveProperty('fake', 'aardvark');
+    expect(api.currOpts).toHaveProperty('bogus', 'pangolin');
     expect(api.currOpts.headers).not.toHaveProperty('artificial');
     expect(Object.keys(api.currOpts.headers).length).toEqual(originalHeadersLength);
   })
+
 });
