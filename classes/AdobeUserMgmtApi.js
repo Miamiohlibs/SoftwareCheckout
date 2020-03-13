@@ -22,22 +22,25 @@ module.exports = class AdobeUserMgmtApi {
   querySetup(baseOpts, opts) {
     this.currOpts = JSON.parse(JSON.stringify(this.queryConf[baseOpts].options)); //clone values, don't pass by reference
 
-    if (opts.hasOwnProperty('headers')) { 
+    let authHeaders = { Authorization: 'Bearer ' + this.accessToken, 'x-api-key': this.credentials.clientId }
+
+    if (opts.hasOwnProperty('headers')) {
       var tmpHeaders = opts.headers;
       delete opts.headers;
     }
+    // add additional opts from argument
     this.currOpts = Object.assign(this.currOpts, opts);
+
+    // add auth headers
+    this.currOpts.headers = Object.assign(this.currOpts.headers, authHeaders);
+    // add other specified headers
     if (typeof tmpHeaders !== 'undefined') {
-     this.currOpts.headers = Object.assign(this.currOpts.headers, tmpHeaders); 
+      this.currOpts.headers = Object.assign(this.currOpts.headers, tmpHeaders);
     }
 
+  }
 
-    // for (const property in opts) {
-    //   // if(property === 'headers') {
-    //   //   //add to headers, don't overwrite them
-    //   //   this.currOpts.headers.assign(opts['headers']);
-    //   // }
-    //   this.currOpts = Object.assign(this.currOpts, opts[property]);
-    // }
+  getActionPath(action, i = 0) {
+    return this.queryConf.generic.options.pathStem + action + '/' + this.credentials.orgId + '/0?';
   }
 }
