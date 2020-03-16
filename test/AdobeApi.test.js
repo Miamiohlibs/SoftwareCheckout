@@ -100,6 +100,12 @@ describe('getActionPath', () => {
     expect(response).toEqual(expected);
   });
 
+  it('should not paginate where action == action', () => {
+    let response = api.getActionPath('action');
+    let expected = expect.stringMatching(/^\/v2\/usermanagement\/action\/.*@AdobeOrg\/\?/);
+    expect(response).toEqual(expected);
+  });
+
   it('should throw an error with no args', () => {
     function noArgs () {
       api.getActionPath();

@@ -53,7 +53,10 @@ module.exports = class AdobeUserMgmtApi {
       throw new Error('page must be a number or numeric string; typeof page = ' + typeof page);
       // console.log('Page: ', page, parseInt(page))
     } 
-    
+    if (action == 'action') { 
+      page = '';
+    }
+
     // build query path
     let path = this.queryConf.generic.options.pathStem + action + '/' + this.credentials.orgId + '/' + page;
     if (argument != null && argument != undefined) {
