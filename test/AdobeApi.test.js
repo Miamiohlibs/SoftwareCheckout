@@ -30,6 +30,29 @@ describe('Queries', () => {
     expect(typeof api.accessToken).toBe('string');
   });
 
+  it('should add Auth and x-api-key headers using querySetup("generic") with no other arguments', () => {
+    var genericOpts = api.queryConf.generic.options;
+    // console.log('genericOpts', api.queryConf.generic.options);
+    const originalHeadersLength = Object.keys(genericOpts.headers).length;
+    api.querySetup('generic');
+    expect(api.currOpts).toHaveProperty('headers');
+    expect(Object.keys(api.currOpts.headers).length).toEqual(originalHeadersLength + 2);
+    expect(api.currOpts.headers).toHaveProperty('x-api-key');
+    expect(api.currOpts.headers).toHaveProperty('Authorization');
+    let firstWord = api.currOpts.headers.Authorization.split(' ')[0];
+    expect(firstWord).toBe('Bearer');
+  })
+
+  it('should add Auth and x-api-key headers using querySetup() with extra arguments', () => {
+    var genericOpts = api.queryConf.generic.options;
+    // console.log('genericOpts', api.queryConf.generic.options);
+    const originalHeadersLength = Object.keys(genericOpts.headers).length;
+    api.querySetup('generic', { fake: 'aardvark', bogus: 'pangolin' });
+    expect(api.currOpts).toHaveProperty('fake', 'aardvark');
+    expect(api.currOpts).toHaveProperty('bogus', 'pangolin');
+    expect(Object.keys(api.currOpts.headers).length).toEqual(originalHeadersLength + 2);
+  })
+
   it('should be able to add queryConfigs using querySetup() with extra headers', () => {
     var genericOpts = api.queryConf.generic.options;
     console.log('genericOpts', genericOpts)
@@ -38,18 +61,6 @@ describe('Queries', () => {
     expect(api.currOpts).toHaveProperty('fake', 'aardvark');
     expect(api.currOpts).toHaveProperty('bogus', 'pangolin');
     expect(api.currOpts.headers).toHaveProperty('artificial', 'imaginary');
-    expect(Object.keys(api.currOpts.headers).length).toEqual(originalHeadersLength + 1);
-  })
-
-  it('should be able to add queryConfigs using querySetup() with NO extra headers', () => {
-    var genericOpts = api.queryConf.generic.options;
-    // console.log('genericOpts', api.queryConf.generic.options);
-    const originalHeadersLength = Object.keys(genericOpts.headers).length;
-    api.querySetup('generic', { fake: 'aardvark', bogus: 'pangolin' });
-    expect(api.currOpts).toHaveProperty('fake', 'aardvark');
-    expect(api.currOpts).toHaveProperty('bogus', 'pangolin');
-    expect(api.currOpts.headers).not.toHaveProperty('artificial');
-    expect(Object.keys(api.currOpts.headers).length).toEqual(originalHeadersLength);
-  })
-
+    expect(Object.keys(api.currOpts.headers).length).toEqual(originalHeadersLength + 3);
+  });
 });

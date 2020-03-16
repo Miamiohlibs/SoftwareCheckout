@@ -19,17 +19,19 @@ module.exports = class AdobeUserMgmtApi {
   }
 
   // start with a basic set of options, add or overwrite with new options
-  querySetup(baseOpts, opts) {
+  querySetup(baseOpts, opts = null) {
     this.currOpts = JSON.parse(JSON.stringify(this.queryConf[baseOpts].options)); //clone values, don't pass by reference
 
     let authHeaders = { Authorization: 'Bearer ' + this.accessToken, 'x-api-key': this.credentials.clientId }
 
-    if (opts.hasOwnProperty('headers')) {
-      var tmpHeaders = opts.headers;
-      delete opts.headers;
+    if (opts != null) {
+      if (opts.hasOwnProperty('headers')) {
+        var tmpHeaders = opts.headers;
+        delete opts.headers;
+      }
+      // add additional opts from argument
+      this.currOpts = Object.assign(this.currOpts, opts);
     }
-    // add additional opts from argument
-    this.currOpts = Object.assign(this.currOpts, opts);
 
     // add auth headers
     this.currOpts.headers = Object.assign(this.currOpts.headers, authHeaders);
