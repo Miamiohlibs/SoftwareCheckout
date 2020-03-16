@@ -78,4 +78,10 @@ module.exports = class AdobeUserMgmtApi {
     return this.executeCurrQuery();
   }
 
+  async callGroupUsers(groupName) {
+    groupName = encodeURI(groupName);
+    let path = this.getActionPath('users',groupName);
+    this.querySetup('generic', { method: 'GET', path: path } );
+    return this.executeCurrQuery();
+  }
 }
