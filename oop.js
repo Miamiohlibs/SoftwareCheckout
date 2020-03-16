@@ -80,9 +80,7 @@ const async = require('async');
    
     await async.eachOf(adobeGroups, async list => {
       let response = await adobe.callGroupUsers(list.groupName);
-      // console.log(response);
       adobeUserList[list.groupName] = adobe.getCurrentUsernames(JSON.parse(response));
-      // console.log(item.groupName, 'Adobe users:',users);
     });
     console.log('Adobe Users:', adobeUserList);
   } catch (err) { 
