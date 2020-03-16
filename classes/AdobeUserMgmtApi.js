@@ -51,7 +51,7 @@ module.exports = class AdobeUserMgmtApi {
       page = 0;
     } else if (isNaN(page)) {
       throw new Error('page must be a number or numeric string; typeof page = ' + typeof page);
-      console.log('Page: ', page, parseInt(page))
+      // console.log('Page: ', page, parseInt(page))
     } 
     
     // build query path
@@ -67,7 +67,7 @@ module.exports = class AdobeUserMgmtApi {
   async executeCurrQuery() { 
     let obj = {}
     obj.options = this.currOpts;
-    console.log(obj)
+    // console.log(obj)
     let query = new Query(obj);
     return await query.execute();
   }
@@ -90,8 +90,11 @@ module.exports = class AdobeUserMgmtApi {
     return users
       // with status == active
       .filter(item => item.status == 'active')
-      // and just return an array of emails
-      .map(item => item.email);
+      // and just return an array of email usernames
+      .map(item => {
+        let email = item.email;
+        return email.substring(0, email.indexOf('@'));
+      });
   }
 }
 

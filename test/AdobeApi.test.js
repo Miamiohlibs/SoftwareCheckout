@@ -124,6 +124,6 @@ describe('getCurrentUsernames', () => {
     response = api.getCurrentUsernames(sampleGroupMembers);
     expect(response).toBeInstanceOf(Array);
     expect(response.length).toBe(1);
-    expect(response[0]).toBe('irwinkr@miamioh.edu');
+    expect(response[0]).toBe('irwinkr');
   });
 });

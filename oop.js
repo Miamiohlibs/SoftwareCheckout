@@ -4,10 +4,8 @@ const LibCalApi = require('./classes/LibCalApi');
 const libCalConf = require('./config/libCal');
 const CampusApi = require('./classes/CampusApi');
 const campusConf = require('./config/campusIT');
-// const adobeConf = require('./config/adobe').credentials;
 const adobeConf = require('./config/adobe');
 const AdobeApi = require('./classes/AdobeUserMgmtApi');
-// const adodbeAuth = require('@adobe/jwt-auth');
 const fs = require('fs');
 const async = require('async');
 
@@ -36,17 +34,13 @@ const async = require('async');
   }
 
   // get Adobe Token
+  const adobe = new AdobeApi(adobeConf);
   try {
-    const adobe = new AdobeApi(adobeConf);
     await adobe.getToken();
-    // adobeConf.privateKey = fs.readFileSync('./certs/private.key', 'utf8');
-    // let tokenResponse = await adodbeAuth(adobeConf);
-    // let adobeToken = tokenResponse.access_token;
     console.log('Adobe token:',adobe.accessToken);
   } catch (err) {
     console.error('Unable to get Adobe token:',err)
   }
-
 
   // Get Campus Lists
   try {
@@ -79,6 +73,21 @@ const async = require('async');
 
 
   // get Adobe user lists
+  let adobeUserList = {};
 
-  // .callGroupUsers('library patron api test');
+  try { 
+    const adobeGroups = [{ groupName: 'library patron api test', campusList: 'bogusList'}];
+   
+    await async.eachOf(adobeGroups, async list => {
+      let response = await adobe.callGroupUsers(list.groupName);
+      // console.log(response);
+      adobeUserList[list.groupName] = adobe.getCurrentUsernames(JSON.parse(response));
+      // console.log(item.groupName, 'Adobe users:',users);
+    });
+    console.log('Adobe Users:', adobeUserList);
+  } catch (err) { 
+    console.error('Cannot get Adobe list:', err);
+  }
+
+  
 })();
