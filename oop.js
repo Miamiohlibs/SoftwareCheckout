@@ -4,9 +4,10 @@ const LibCalApi = require('./classes/LibCalApi');
 const libCalConf = require('./config/libCal');
 const CampusApi = require('./classes/CampusApi');
 const campusConf = require('./config/campusIT');
-const adobeConf = require('./config/adobe').credentials;
-// const AdobeApi = require('./classes/AdobeUserMgmtApi');
-const adodbeAuth = require('@adobe/jwt-auth');
+// const adobeConf = require('./config/adobe').credentials;
+const adobeConf = require('./config/adobe');
+const AdobeApi = require('./classes/AdobeUserMgmtApi');
+// const adodbeAuth = require('@adobe/jwt-auth');
 const fs = require('fs');
 const async = require('async');
 
@@ -36,10 +37,12 @@ const async = require('async');
 
   // get Adobe Token
   try {
-    adobeConf.privateKey = fs.readFileSync('./certs/private.key', 'utf8');
-    let tokenResponse = await adodbeAuth(adobeConf);
-    let adobeToken = tokenResponse.access_token;
-    console.log('Adobe token:',adobeToken);
+    const adobe = new AdobeApi(adobeConf);
+    await adobe.getToken();
+    // adobeConf.privateKey = fs.readFileSync('./certs/private.key', 'utf8');
+    // let tokenResponse = await adodbeAuth(adobeConf);
+    // let adobeToken = tokenResponse.access_token;
+    console.log('Adobe token:',adobe.accessToken);
   } catch (err) {
     console.error('Unable to get Adobe token:',err)
   }
@@ -73,4 +76,9 @@ const async = require('async');
   } catch (err) {
     console.error('Error getting LibCal lists:', err);
   }
+
+
+  // get Adobe user lists
+
+  // .callGroupUsers('library patron api test');
 })();
