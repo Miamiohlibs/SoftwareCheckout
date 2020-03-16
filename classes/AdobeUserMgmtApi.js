@@ -52,9 +52,7 @@ module.exports = class AdobeUserMgmtApi {
     } else if (isNaN(page)) {
       throw new Error('page must be a number or numeric string; typeof page = ' + typeof page);
       console.log('Page: ', page, parseInt(page))
-    } else {
-      console.log(page,'is totally a number:',parseInt(page));
-    }
+    } 
     
     // build query path
     let path = this.queryConf.generic.options.pathStem + action + '/' + this.credentials.orgId + '/' + page;
@@ -65,4 +63,19 @@ module.exports = class AdobeUserMgmtApi {
     }
     return path;
   }
+
+  async executeCurrQuery() { 
+    let obj = {}
+    obj.options = this.currOpts;
+    console.log(obj)
+    let query = new Query(obj);
+    return await query.execute();
+  }
+
+  async callGetGroups() {
+    let path = this.getActionPath('groups');
+    this.querySetup('generic', { method: 'GET', path: path } );
+    return this.executeCurrQuery();
+  }
+
 }
