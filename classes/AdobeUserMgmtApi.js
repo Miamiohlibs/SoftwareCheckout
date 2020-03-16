@@ -42,7 +42,27 @@ module.exports = class AdobeUserMgmtApi {
 
   }
 
-  getActionPath(action, i = 0) {
-    return this.queryConf.generic.options.pathStem + action + '/' + this.credentials.orgId + '/0?';
+  getActionPath(action, argument = null, page = 0) {
+    //validate input
+    if (typeof action != 'string') {
+      throw new Error('action must be a string; typeof action = ' + typeof action);
+    }
+    if (page == null) {
+      page = 0;
+    } else if (isNaN(page)) {
+      throw new Error('page must be a number or numeric string; typeof page = ' + typeof page);
+      console.log('Page: ', page, parseInt(page))
+    } else {
+      console.log(page,'is totally a number:',parseInt(page));
+    }
+    
+    // build query path
+    let path = this.queryConf.generic.options.pathStem + action + '/' + this.credentials.orgId + '/' + page;
+    if (argument != null && argument != undefined) {
+      path += '/' + argument + '?';
+    } else {
+      path += '?';
+    }
+    return path;
   }
 }

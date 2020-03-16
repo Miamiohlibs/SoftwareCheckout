@@ -64,3 +64,49 @@ describe('Queries', () => {
     expect(Object.keys(api.currOpts.headers).length).toEqual(originalHeadersLength + 3);
   });
 });
+
+describe('getActionPath', () => {
+  it('should return a valid path with just an action argument', () => {
+    let response = api.getActionPath('users');
+    let expected = expect.stringMatching(/^\/v2\/usermanagement\/users\/.*@AdobeOrg\/0\?/);
+    expect(response).toEqual(expected);
+  });
+
+  it('should return a valid path with args: action, argument', () => {
+    let response = api.getActionPath('users','myarg');
+    let expected = expect.stringMatching(/^\/v2\/usermanagement\/users\/.*@AdobeOrg\/0\/myarg\?/);
+    expect(response).toEqual(expected);
+  });
+
+  it('should return a valid path with args: action, argument, page', () => {
+    let response = api.getActionPath('users','myarg',2);
+    let expected = expect.stringMatching(/^\/v2\/usermanagement\/users\/.*@AdobeOrg\/2\/myarg\?/);
+    expect(response).toEqual(expected);
+  });
+
+  it('should return a valid path with args: action, null, page', () => {
+    let response = api.getActionPath('users',null,2);
+    let expected = expect.stringMatching(/^\/v2\/usermanagement\/users\/.*@AdobeOrg\/2\?/);
+    expect(response).toEqual(expected);
+  });
+
+  it('should return a valid path with args: action, argument, null', () => {
+    let response = api.getActionPath('users','myarg',null);
+    let expected = expect.stringMatching(/^\/v2\/usermanagement\/users\/.*@AdobeOrg\/0\/myarg\?/);
+    expect(response).toEqual(expected);
+  });
+
+  it('should throw an error with no args', () => {
+    function noArgs () {
+      api.getActionPath();
+    }
+    expect(noArgs).toThrowError(Error);
+  });
+
+  it('should return an error with non-integer page arg', () => {
+    function hamsterMany () {
+      api.getActionPath('generic',null,'hamster');
+    }
+    expect(hamsterMany).toThrowError(Error);
+  });
+});
