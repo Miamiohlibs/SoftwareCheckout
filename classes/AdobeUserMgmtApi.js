@@ -87,7 +87,11 @@ module.exports = class AdobeUserMgmtApi {
 
   getCurrentUsernames(obj) {
     let users = obj.users;
-    return users.filter(item => item.status == 'active').map(item => item.email);
+    return users
+      // with status == active
+      .filter(item => item.status == 'active')
+      // and just return an array of emails
+      .map(item => item.email);
   }
 }
 
