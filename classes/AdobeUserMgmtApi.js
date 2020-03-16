@@ -84,4 +84,10 @@ module.exports = class AdobeUserMgmtApi {
     this.querySetup('generic', { method: 'GET', path: path } );
     return this.executeCurrQuery();
   }
+
+  getCurrentUsernames(obj) {
+    let users = obj.users;
+    return users.filter(item => item.status == 'active').map(item => item.email);
+  }
 }
+

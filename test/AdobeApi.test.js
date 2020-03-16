@@ -1,6 +1,7 @@
 const sampleConf = require('./sample-data/adobeConfSample');
 const realConf = require('../config/adobe');
 const AdobeUserMgmtApi = require('../classes/AdobeUserMgmtApi');
+const sampleGroupMembers = require('./sample-data/adobeGroupMembers');
 
 describe('Initialization', () => {
 
@@ -66,6 +67,9 @@ describe('Queries', () => {
 });
 
 describe('getActionPath', () => {
+  beforeEach(async () => {
+    api = new AdobeUserMgmtApi(realConf);
+  });
   it('should return a valid path with just an action argument', () => {
     let response = api.getActionPath('users');
     let expected = expect.stringMatching(/^\/v2\/usermanagement\/users\/.*@AdobeOrg\/0\?/);
@@ -108,5 +112,18 @@ describe('getActionPath', () => {
       api.getActionPath('generic',null,'hamster');
     }
     expect(hamsterMany).toThrowError(Error);
+  });
+});
+
+describe('getCurrentUsernames', () => {
+  beforeEach(async () => {
+    api = new AdobeUserMgmtApi(realConf);
+    await api.getToken();
+  });
+  it('should just get one username back', () => { 
+    response = api.getCurrentUsernames(sampleGroupMembers);
+    expect(response).toBeInstanceOf(Array);
+    expect(response.length).toBe(1);
+    expect(response[0]).toBe('irwinkr@miamioh.edu');
   });
 });
