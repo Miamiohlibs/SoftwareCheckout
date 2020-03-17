@@ -67,11 +67,16 @@ module.exports = class AdobeUserMgmtApi {
     return path;
   }
 
-  async executeCurrQuery() { 
+  async executeCurrQuery(body = null) { 
     let obj = {}
     obj.options = this.currOpts;
     // console.log(obj)
     let query = new Query(obj);
+    if (body !== null) { 
+      query.setData(body);
+    }
+    console.log(query)
+    console.log(query.queryConf.options.headers)
     return await query.execute();
   }
 
@@ -98,6 +103,19 @@ module.exports = class AdobeUserMgmtApi {
         let email = item.email;
         return email.substring(0, email.indexOf('@'));
       });
+  }
+
+  createAddJsonBody(user, country, firstName, lastName, groups, n=1) {
+    let doObj = [{
+      'createFederatedID': {
+        email: user,
+        country: country,
+        firstname: firstName,
+        lastname: lastName,
+        option: 'ignoreIfAlreadyExists'
+      }
+    }];
+    return [{ user: user, requestID: 'action_'+n, do: doObj}]
   }
 }
 

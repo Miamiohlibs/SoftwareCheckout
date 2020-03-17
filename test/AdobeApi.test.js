@@ -133,3 +133,23 @@ describe('getCurrentUsernames', () => {
     expect(response[0]).toBe('irwinkr');
   });
 });
+
+describe('createAddJsonBody', () => {
+  beforeEach(async () => {
+    api = new AdobeUserMgmtApi(realConf);
+  });
+  it('it should build an object with createFederatedId', () => { 
+    response = api.createAddJsonBody('fakeuser@miamioh.edu','US','Fake','User', ['fake user group1', 'fake group 2']);
+    expect(response).toBeInstanceOf(Array);
+    expect(typeof response[0]).toBe('object');
+    expect(response[0].user).toBe('fakeuser@miamioh.edu');
+    expect(response[0].requestID).toBe('action_1');
+    expect(response[0].do).toBeInstanceOf(Array);
+    expect(response[0].do[0]).toHaveProperty('createFederatedID');
+    expect(response[0].do[0].createFederatedID).toHaveProperty('email','fakeuser@miamioh.edu')
+    expect(response[0].do[0].createFederatedID).toHaveProperty('country','US');
+    expect(response[0].do[0].createFederatedID).toHaveProperty('firstname','Fake');
+    expect(response[0].do[0].createFederatedID).toHaveProperty('lastname','User');
+    expect(response[0].do[0].createFederatedID).toHaveProperty('option','ignoreIfAlreadyExists');
+  });
+});
