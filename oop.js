@@ -37,9 +37,9 @@ const async = require('async');
   const adobe = new AdobeApi(adobeConf);
   try {
     await adobe.getToken();
-    console.log('Adobe token:',adobe.accessToken);
+    console.log('Adobe token:', adobe.accessToken);
   } catch (err) {
-    console.error('Unable to get Adobe token:',err)
+    console.error('Unable to get Adobe token:', err)
   }
 
   // Get Campus Lists
@@ -57,7 +57,7 @@ const async = require('async');
     lcSoftware = lcApi.mapLibCal2CampusCodes(lcSoftware, campusConf.software);
     console.debug(JSON.stringify(lcSoftware, null, 4));
     // lcBookings = lcApi.getCurrentLibCalBookings(lcSoftware);
-    
+
 
     await async.eachOf(lcSoftware, async software => {
       let lcBookings = lcApi.getCurrentLibCalBookings(software.bookings)
@@ -77,9 +77,9 @@ const async = require('async');
   // get Adobe user lists
   let adobeUserList = {};
   let addToAdobe = {};
-  try { 
-    const adobeGroups = [{ groupName: 'library patron api test', campusList: 'photoshop'}];
-   
+  try {
+    const adobeGroups = [{ groupName: 'library patron api test', campusList: 'photoshop' }];
+
     await async.eachOf(adobeGroups, async list => {
       let response = await adobe.callGroupUsers(list.groupName);
       adobeUserList[list.groupName] = adobe.getCurrentUsernames(JSON.parse(response));
@@ -91,23 +91,30 @@ const async = require('async');
       var thisAdobeList = adobeUserList[thisAdobeListName];
       console.log(thisCampusListName, '(libcal):', thisCampusList.length);
       console.log(thisAdobeListName, '(adobe)', thisAdobeList.length);
-      addToAdobe[thisAdobeListName] = thisCampusList.filter(user => ! thisAdobeList.includes(user.email) );
+      addToAdobe[thisAdobeListName] = thisCampusList.filter(user => !thisAdobeList.includes(user.email));
       // deleteFromAdobe[thisAdobeListName] = thisAdobeList.filter(email => )
       console.log('adobeList:', thisAdobeListName, thisAdobeList);
       console.log('addToAdobe:', addToAdobe)
-      let jsonBody = adobe.prepBulkAddFromLibCal2Adobe(addToAdobe[thisAdobeListName], thisAdobeListName);
+      let jsonBody = '';
+      if (addToAdobe[thisAdobeListName].length > 0) {
+        jsonBody += adobe.prepBulkAddFromLibCal2Adobe(addToAdobe[thisAdobeListName], thisAdobeListName);
+      }
+
       // console.log(jsonBody);
       // console.log(JSON.stringify(jsonBody, null, 4));
 
-      response = await adobe.callSubmitJson(jsonBody);
-      console.log(response);
-      
+      if (jsonBody != '') {
+        response = await adobe.callSubmitJson(jsonBody);
+        console.log(response);
+      } else {
+        console.log('No update required; none submitted');
+      }
     });
-    
+
     // console.log('Add Adobe Users:', addToAdobe);
-  } catch (err) { 
+  } catch (err) {
     console.error('Cannot get Adobe list:', err);
   }
 
-  
+
 })();
