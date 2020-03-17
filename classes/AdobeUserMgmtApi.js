@@ -93,18 +93,22 @@ module.exports = class AdobeUserMgmtApi {
     return this.executeCurrQuery();
   }
 
+  async callSubmitJson(body) {
+    let path = await this.getActionPath('action');
+    this.querySetup('generic', { method: 'POST', path: path, headers: { 'Content-Type': 'application/json' } })
+    return this.executeCurrQuery(body);
+  }
+
   getCurrentUsernames(obj) {
     let users = obj.users;
     return users
       // with status == active
       .filter(item => item.status == 'active')
-
-      // let's return whole emails instead of using this next section to
-      // just return an array of email usernames
-      // .map(item => {
-      //   let email = item.email;
-      //   return email.substring(0, email.indexOf('@'));
-      // });
+      // just return an array of email 
+      .map(item => {
+        let email = item.email;
+        return email;
+      });
   }
 
   createAddJsonBody(user, country, firstName, lastName, groups, n=1) {
