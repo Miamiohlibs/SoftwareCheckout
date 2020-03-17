@@ -51,18 +51,20 @@ const async = require('async');
   }
 
   // Get LibCal Lists
+  let lcUserList = {};
   try {
     let lcSoftware = await lcApi.getLibCalLists();
     lcSoftware = lcApi.mapLibCal2CampusCodes(lcSoftware, campusConf.software);
     console.debug(JSON.stringify(lcSoftware, null, 4));
     // lcBookings = lcApi.getCurrentLibCalBookings(lcSoftware);
-    let lcUserList = {};
+    
 
     await async.eachOf(lcSoftware, async software => {
       let lcBookings = lcApi.getCurrentLibCalBookings(software.bookings)
-      let emailBookings = lcApi.getEmailsFromBookings(lcBookings);
+      console.log(lcBookings)
+      // let emailBookings = lcApi.getEmailsFromBookings(lcBookings);
       // console.log('Email bookings', emailBookings);
-      lcUserList[software.campusCode] = await campusApi.convertMultipleEmails(emailBookings);
+      lcUserList[software.campusCode] = lcBookings; // await campusApi.convertMultipleEmails(emailBookings);
       // console.log('userlist:', software.campusCode, lcUserList[software.campusCode]);
     });
 
@@ -74,15 +76,35 @@ const async = require('async');
 
   // get Adobe user lists
   let adobeUserList = {};
-
+  let addToAdobe = {};
   try { 
-    const adobeGroups = [{ groupName: 'library patron api test', campusList: 'bogusList'}];
+    const adobeGroups = [{ groupName: 'library patron api test', campusList: 'photoshop'}];
    
     await async.eachOf(adobeGroups, async list => {
       let response = await adobe.callGroupUsers(list.groupName);
       adobeUserList[list.groupName] = adobe.getCurrentUsernames(JSON.parse(response));
+
+      // filter libcal response to determine what needs to be added to adobe:
+      var thisCampusListName = list.campusList;
+      var thisAdobeListName = list.groupName;
+      var thisCampusList = lcUserList[thisCampusListName];
+      var thisAdobeList = adobeUserList[thisAdobeListName];
+      console.log(thisCampusListName, '(libcal):', thisCampusList.length);
+      console.log(thisAdobeListName, '(adobe)', thisAdobeList.length);
+      addToAdobe[thisAdobeListName] = thisCampusList.filter(user => ! thisAdobeList.includes(user.email) );
+      // deleteFromAdobe[thisAdobeListName] = thisAdobeList.filter(email => )
+      console.log('adobeList:', thisAdobeListName, thisAdobeList);
+      console.log('addToAdobe:', addToAdobe)
+      let jsonBody = adobe.prepBulkAddFromLibCal2Adobe(addToAdobe[thisAdobeListName], thisAdobeListName);
+      // console.log(jsonBody);
+      // console.log(JSON.stringify(jsonBody, null, 4));
+
+      response = await adobe.callSubmitJson(jsonBody);
+      console.log(response);
+      
     });
-    console.log('Adobe Users:', adobeUserList);
+    
+    // console.log('Add Adobe Users:', addToAdobe);
   } catch (err) { 
     console.error('Cannot get Adobe list:', err);
   }
