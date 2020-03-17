@@ -113,6 +113,9 @@ module.exports = class AdobeUserMgmtApi {
         firstname: firstName,
         lastname: lastName,
         option: 'ignoreIfAlreadyExists'
+      },
+      'add': {
+        group: groups
       }
     }];
     return [{ user: user, requestID: 'action_'+n, do: doObj}]

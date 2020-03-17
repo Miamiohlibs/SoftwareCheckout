@@ -137,19 +137,30 @@ describe('getCurrentUsernames', () => {
 describe('createAddJsonBody', () => {
   beforeEach(async () => {
     api = new AdobeUserMgmtApi(realConf);
-  });
-  it('it should build an object with createFederatedId', () => { 
     response = api.createAddJsonBody('fakeuser@miamioh.edu','US','Fake','User', ['fake user group1', 'fake group 2']);
+  });
+  it('it should build an object with createFederatedId and add functions', () => { 
     expect(response).toBeInstanceOf(Array);
     expect(typeof response[0]).toBe('object');
     expect(response[0].user).toBe('fakeuser@miamioh.edu');
     expect(response[0].requestID).toBe('action_1');
     expect(response[0].do).toBeInstanceOf(Array);
     expect(response[0].do[0]).toHaveProperty('createFederatedID');
+    expect(response[0].do[0]).toHaveProperty('add');
+  });
+
+  it('it should give createFederatedId the apprpriate fields', () => { 
     expect(response[0].do[0].createFederatedID).toHaveProperty('email','fakeuser@miamioh.edu')
     expect(response[0].do[0].createFederatedID).toHaveProperty('country','US');
     expect(response[0].do[0].createFederatedID).toHaveProperty('firstname','Fake');
     expect(response[0].do[0].createFederatedID).toHaveProperty('lastname','User');
     expect(response[0].do[0].createFederatedID).toHaveProperty('option','ignoreIfAlreadyExists');
+  });
+
+  it('it should give "add" the apprpriate fields', () => { 
+    expect(response[0].do[0].add).toHaveProperty('group');
+    expect(response[0].do[0].add.group).toBeInstanceOf(Array);
+    expect(response[0].do[0].add.group[0]).toBe('fake user group1');
+    expect(response[0].do[0].add.group[1]).toBe('fake group 2');
   });
 });
