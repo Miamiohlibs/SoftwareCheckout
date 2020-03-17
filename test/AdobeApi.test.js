@@ -121,46 +121,62 @@ describe('getActionPath', () => {
   });
 });
 
-describe('getCurrentUsernames', () => {
-  beforeEach(async () => {
-    api = new AdobeUserMgmtApi(realConf);
-    await api.getToken();
-  });
-  it('should just get one username back', () => { 
-    response = api.getCurrentUsernames(sampleGroupMembers);
-    expect(response).toBeInstanceOf(Array);
-    expect(response.length).toBe(1);
-    expect(response[0]).toBe('irwinkr');
-  });
-});
+// describe('getCurrentUsernames', () => {
+//   beforeEach(async () => {
+//     api = new AdobeUserMgmtApi(realConf);
+//     await api.getToken();
+//   });
+//   it('should just get one username back', () => { 
+//     response = api.getCurrentUsernames(sampleGroupMembers);
+//     expect(response).toBeInstanceOf(Array);
+//     expect(response.length).toBe(1);
+//     expect(response).toBe('irwinkr');
+//   });
+// });
 
 describe('createAddJsonBody', () => {
   beforeEach(async () => {
     api = new AdobeUserMgmtApi(realConf);
     response = api.createAddJsonBody('fakeuser@miamioh.edu','US','Fake','User', ['fake user group1', 'fake group 2']);
   });
-  it('it should build an object with createFederatedId and add functions', () => { 
-    expect(response).toBeInstanceOf(Array);
-    expect(typeof response[0]).toBe('object');
-    expect(response[0].user).toBe('fakeuser@miamioh.edu');
-    expect(response[0].requestID).toBe('action_1');
-    expect(response[0].do).toBeInstanceOf(Array);
-    expect(response[0].do[0]).toHaveProperty('createFederatedID');
-    expect(response[0].do[0]).toHaveProperty('add');
+  it('should build an object with createFederatedId and add functions', () => { 
+    expect(typeof response).toBe('object');
+    expect(response.user).toBe('fakeuser@miamioh.edu');
+    expect(response.requestID).toBe('action_1');
+    expect(response.do).toBeInstanceOf(Array);
+    expect(response.do[0]).toHaveProperty('createFederatedID');
+    expect(response.do[0]).toHaveProperty('add');
   });
 
-  it('it should give createFederatedId the apprpriate fields', () => { 
-    expect(response[0].do[0].createFederatedID).toHaveProperty('email','fakeuser@miamioh.edu')
-    expect(response[0].do[0].createFederatedID).toHaveProperty('country','US');
-    expect(response[0].do[0].createFederatedID).toHaveProperty('firstname','Fake');
-    expect(response[0].do[0].createFederatedID).toHaveProperty('lastname','User');
-    expect(response[0].do[0].createFederatedID).toHaveProperty('option','ignoreIfAlreadyExists');
+  it('should give createFederatedId the apprpriate fields', () => { 
+    expect(response.do[0].createFederatedID).toHaveProperty('email','fakeuser@miamioh.edu')
+    expect(response.do[0].createFederatedID).toHaveProperty('country','US');
+    expect(response.do[0].createFederatedID).toHaveProperty('firstname','Fake');
+    expect(response.do[0].createFederatedID).toHaveProperty('lastname','User');
+    expect(response.do[0].createFederatedID).toHaveProperty('option','ignoreIfAlreadyExists');
   });
 
-  it('it should give "add" the apprpriate fields', () => { 
-    expect(response[0].do[0].add).toHaveProperty('group');
-    expect(response[0].do[0].add.group).toBeInstanceOf(Array);
-    expect(response[0].do[0].add.group[0]).toBe('fake user group1');
-    expect(response[0].do[0].add.group[1]).toBe('fake group 2');
+  it('should give "add" the apprpriate fields', () => { 
+    expect(response.do[0].add).toHaveProperty('group');
+    expect(response.do[0].add.group).toBeInstanceOf(Array);
+    expect(response.do[0].add.group[0]).toBe('fake user group1');
+    expect(response.do[0].add.group[1]).toBe('fake group 2');
   });
 });
+
+describe('prepBulkAddFromLibCal2Adobe', () => {
+  beforeEach( () => {
+    api = new AdobeUserMgmtApi(realConf);
+    const bookingsToAdd = require('./sample-data/libCalBookingsToAdd2Adobe');
+    response = api.prepBulkAddFromLibCal2Adobe(bookingsToAdd);
+  });
+
+  it('should bring back an array of two to-dos for two people', () => {
+    expect(response).toBeInstanceOf(Array);
+    expect(typeof response[0]).toBe('object');
+    expect(response.length).toBe(2);
+    expect(response[0]).toHaveProperty('user','fakeuser@miamioh.edu');
+    expect(response[1]).toHaveProperty('user','bogususer@miamioh.edu');
+  });
+
+})

@@ -98,11 +98,13 @@ module.exports = class AdobeUserMgmtApi {
     return users
       // with status == active
       .filter(item => item.status == 'active')
-      // and just return an array of email usernames
-      .map(item => {
-        let email = item.email;
-        return email.substring(0, email.indexOf('@'));
-      });
+
+      // let's return whole emails instead of using this next section to
+      // just return an array of email usernames
+      // .map(item => {
+      //   let email = item.email;
+      //   return email.substring(0, email.indexOf('@'));
+      // });
   }
 
   createAddJsonBody(user, country, firstName, lastName, groups, n=1) {
@@ -118,7 +120,17 @@ module.exports = class AdobeUserMgmtApi {
         group: groups
       }
     }];
-    return [{ user: user, requestID: 'action_'+n, do: doObj}]
+    return { user: user, requestID: 'action_'+n, do: doObj};
+  }
+
+  prepBulkAddFromLibCal2Adobe(bookings, listName) {
+    let i = 1;
+    let jsonBody = [];
+    bookings.forEach(item => {
+      jsonBody.push(this.createAddJsonBody(item.email, 'US', item.firstName, item.lastName, [listName], i ));
+      i++;
+    });
+    return jsonBody;
   }
 }
 
