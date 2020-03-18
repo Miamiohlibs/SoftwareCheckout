@@ -3,6 +3,9 @@ const jwtAuth = require('@adobe/jwt-auth');
 const path = require('path');
 const fs = require('fs');
 
+// uncomment this line to suppress debug messages
+console.debug = ()=>{};
+
 module.exports = class AdobeUserMgmtApi {
   constructor(conf) {
     this.credentials = conf.credentials;
@@ -72,8 +75,8 @@ module.exports = class AdobeUserMgmtApi {
     if (body !== null) { 
       query.setData(body);
     }
-    console.log(query)
-    console.log(query.queryConf.options.headers)
+    console.debug(query);
+    console.debug(query.queryConf.options.headers);
     return await query.execute();
   }
 

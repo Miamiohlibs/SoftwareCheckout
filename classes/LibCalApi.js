@@ -1,4 +1,8 @@
 const query = require('../scripts/httpQuery')
+
+// uncomment this line to suppress debug messages
+console.debug = ()=>{};
+
 module.exports = class LibCalApi {
   constructor(conf) {
     this.conf = conf;
@@ -36,7 +40,7 @@ module.exports = class LibCalApi {
     if (element == 'bookings') {
       this.conf.queryConfig.options.path += '?limit=100&lid=' + this.conf.softwareLocation + params;
     }
-    console.log(this.conf.queryConfig.options.path, this.token)
+    console.debug(this.conf.queryConfig.options.path, this.token)
     // get a promise for each call
     try {
       var promise = await query(this.conf.queryConfig).then((response) => {

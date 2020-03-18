@@ -6,8 +6,8 @@ const adobeConf = require('./config/adobe');
 const AdobeApi = require('./classes/AdobeUserMgmtApi');
 const async = require('async');
 
-// comment this line out to suppress debug messages
-// console.debug = ()=>{};
+// uncomment this line to suppress debug messages
+console.debug = ()=>{};
 
 (async () => {
   const startTime = new Date().getTime();
@@ -25,17 +25,9 @@ const async = require('async');
   const adobe = new AdobeApi(adobeConf);
   try {
     await adobe.getToken();
-    console.log('Adobe token:', adobe.accessToken);
+    console.debug('Adobe token:', adobe.accessToken);
   } catch (err) {
     console.error('Unable to get Adobe token:', err)
-  }
-
-  // Get Campus Lists
-  try {
-    let campusLists = await campusApi.getMultipleLists();
-    console.debug(campusLists);
-  } catch (err) {
-    console.error('Error getting campus lists:', err);
   }
 
   // Get LibCal Lists
@@ -48,7 +40,7 @@ const async = require('async');
     await async.eachOf(lcSoftware, async software => {
       if (software.bookings.length > 0) { 
         let lcBookings = lcApi.getCurrentLibCalBookings(software.bookings)
-        console.log('LibCal bookings:', lcBookings);
+        console.debug('LibCal bookings:', software.shortName, lcBookings);
         lcUserList[software.shortName] = lcBookings;
       }
     });
@@ -57,7 +49,6 @@ const async = require('async');
   } catch (err) {
     console.error('Error getting LibCal lists:', err);
   }
-
 
   // get Adobe user lists, compare to libCal, update Adobe as appropriate
   let adobeUserList = {};
