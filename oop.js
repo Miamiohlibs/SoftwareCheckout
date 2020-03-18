@@ -91,20 +91,24 @@ const async = require('async');
       var thisAdobeList = adobeUserList[thisAdobeListName];
       console.log(thisCampusListName, '(libcal):', thisCampusList.length);
       console.log(thisAdobeListName, '(adobe)', thisAdobeList.length);
-      addToAdobe[thisAdobeListName] = thisCampusList.filter(user => !thisAdobeList.includes(user.email));
+
+      addToAdobe[thisAdobeListName] = adobe.filterBookingsToAdd(thisCampusList, thisAdobeList);
+
       // deleteFromAdobe[thisAdobeListName] = thisAdobeList.filter(email => )
+
+
       console.log('adobeList:', thisAdobeListName, thisAdobeList);
       console.log('addToAdobe:', addToAdobe)
       let jsonBody = '';
       if (addToAdobe[thisAdobeListName].length > 0) {
-        jsonBody += adobe.prepBulkAddFromLibCal2Adobe(addToAdobe[thisAdobeListName], thisAdobeListName);
+        jsonBody += JSON.stringify(adobe.prepBulkAddFromLibCal2Adobe(addToAdobe[thisAdobeListName], thisAdobeListName));
       }
 
-      // console.log(jsonBody);
       // console.log(JSON.stringify(jsonBody, null, 4));
 
       if (jsonBody != '') {
-        response = await adobe.callSubmitJson(jsonBody);
+        let json = JSON.parse(jsonBody);
+        response = await adobe.callSubmitJson(json);
         console.log(response);
       } else {
         console.log('No update required; none submitted');
