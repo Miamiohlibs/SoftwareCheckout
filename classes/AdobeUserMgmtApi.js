@@ -111,6 +111,11 @@ module.exports = class AdobeUserMgmtApi {
       });
   }
 
+  filterBookingsToAdd(libCalList, adobeList) {
+    // return bookings not currently represented in Adobe User Management
+    return libCalList.filter(user => ! adobeList.includes(user.email));
+  }
+
   createAddJsonBody(user, country, firstName, lastName, groups, n=1) {
     let doObj = [{
       'createFederatedID': {

@@ -2,6 +2,7 @@ const sampleConf = require('./sample-data/adobeConfSample');
 const realConf = require('../config/adobe');
 const AdobeUserMgmtApi = require('../classes/AdobeUserMgmtApi');
 const sampleGroupMembers = require('./sample-data/adobeGroupMembers');
+const bookingsToAdd = require('./sample-data/libCalBookingsToAdd2Adobe');
 
 describe('Initialization', () => {
 
@@ -134,6 +135,14 @@ describe('getActionPath', () => {
 //   });
 // });
 
+describe('filterBookingsToAdd', () => {
+  api = new AdobeUserMgmtApi(realConf);
+  let remaining = api.filterBookingsToAdd(bookingsToAdd, ['bogususer@miamioh.edu']);
+  expect(remaining).toBeInstanceOf(Array);
+  expect(remaining.length).toBe(1);
+  expect(remaining[0].email).toBe('fakeuser@miamioh.edu');
+})
+
 describe('createAddJsonBody', () => {
   beforeEach(async () => {
     api = new AdobeUserMgmtApi(realConf);
@@ -167,7 +176,6 @@ describe('createAddJsonBody', () => {
 describe('prepBulkAddFromLibCal2Adobe', () => {
   beforeEach( () => {
     api = new AdobeUserMgmtApi(realConf);
-    const bookingsToAdd = require('./sample-data/libCalBookingsToAdd2Adobe');
     response = api.prepBulkAddFromLibCal2Adobe(bookingsToAdd);
   });
 
