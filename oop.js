@@ -69,6 +69,11 @@ const async = require('async');
 
     await async.eachOf(adobeGroups, async list => {
       let response = await adobe.callGroupUsers(list.adobeGroupName);
+      if (JSON.parse(response).hasOwnProperty('result')) {
+        console.log('Error reading Adobe group in:', list);
+        console.log('One or more needed values may not be set');
+      }
+      // console.debug('list for:',list.adobeGroupName);
       adobeUserList[list.adobeGroupName] = adobe.getCurrentUsernames(JSON.parse(response));
 
       // filter libcal response to determine what needs to be added to adobe:
