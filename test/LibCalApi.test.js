@@ -2,7 +2,8 @@ const LibCalApi = require('../classes/LibCalApi');
 const conf = require('../config/libCal');
 const sampleBookings = require('./sample-data/libCalBookingsSample');
 // const badConf = conf;
-const campusConf = require('../config/campusIT');
+// const campusConf = require('../config/campusIT');
+const appConf = require('../config/appConf')
 const dynamicDatesBookings = require('./sample-data/libCalBookingsSampleDynamic');
 const bookingObject = require('./sample-data/bookingObject');
 
@@ -54,9 +55,11 @@ describe('LibCalApi can get the booking lists', () => {
   });
 
   it('should add a campusCode to each LibCal category', () => {
-    let softwareWithCodes = myApi.mapLibCal2CampusCodes(sampleBookings, campusConf.software);
-    expect(softwareWithCodes[0]).toHaveProperty('campusCode');
-    expect(softwareWithCodes[0].campusCode).toBe('photoshop');
+    let softwareWithCodes = myApi.mapLibCal2ShortName(sampleBookings, appConf.software);
+    // expect(softwareWithCodes[0]).toHaveProperty('campusCode');
+    expect(softwareWithCodes[0]).toHaveProperty('shortName');
+    // expect(softwareWithCodes[0].campusCode).toBe('photoshop');
+    expect(softwareWithCodes[0].shortName).toBe('photoshop');
   });
 
   it('should correctly filter a bookings array for current, confirmed requests', () => {

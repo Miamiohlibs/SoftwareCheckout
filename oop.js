@@ -1,12 +1,9 @@
 // this is the OOP version of app.js, in progress
-const Query = require('./classes/Query');
 const LibCalApi = require('./classes/LibCalApi');
 const libCalConf = require('./config/libCal');
-const CampusApi = require('./classes/CampusApi');
-const campusConf = require('./config/campusIT');
+const appConf = require('./config/appConf');
 const adobeConf = require('./config/adobe');
 const AdobeApi = require('./classes/AdobeUserMgmtApi');
-const fs = require('fs');
 const async = require('async');
 
 // comment this line out to suppress debug messages
@@ -22,15 +19,6 @@ const async = require('async');
     console.debug('LibCal token:', lcToken)
   } catch {
     console.error('Unable to get LibCal Token');
-  }
-
-  // Get CampusToken
-  try {
-    campusApi = new CampusApi(campusConf);
-    const campusToken = await campusApi.getToken();
-    console.debug('Campus token:', campusToken);
-  } catch {
-    console.error('Unable to get Campus Token');
   }
 
   // get Adobe Token
@@ -54,18 +42,15 @@ const async = require('async');
   let lcUserList = {};
   try {
     let lcSoftware = await lcApi.getLibCalLists();
-    lcSoftware = lcApi.mapLibCal2CampusCodes(lcSoftware, campusConf.software);
+    lcSoftware = lcApi.mapLibCal2ShortName(lcSoftware, appConf.software);
     console.debug(JSON.stringify(lcSoftware, null, 4));
-    // lcBookings = lcApi.getCurrentLibCalBookings(lcSoftware);
-
 
     await async.eachOf(lcSoftware, async software => {
-      let lcBookings = lcApi.getCurrentLibCalBookings(software.bookings)
-      console.log(lcBookings)
-      // let emailBookings = lcApi.getEmailsFromBookings(lcBookings);
-      // console.log('Email bookings', emailBookings);
-      lcUserList[software.campusCode] = lcBookings; // await campusApi.convertMultipleEmails(emailBookings);
-      // console.log('userlist:', software.campusCode, lcUserList[software.campusCode]);
+      if (software.bookings.length > 0) { 
+        let lcBookings = lcApi.getCurrentLibCalBookings(software.bookings)
+        console.log('LibCal bookings:', lcBookings);
+        lcUserList[software.shortName] = lcBookings;
+      }
     });
 
     console.log('LibCal bookings:', lcUserList);
@@ -74,20 +59,21 @@ const async = require('async');
   }
 
 
-  // get Adobe user lists
+  // get Adobe user lists, compare to libCal, update Adobe as appropriate
   let adobeUserList = {};
   let addToAdobe = {};
   let revokeFromAdobe = {};
   try {
-    const adobeGroups = [{ groupName: 'library patron api test', libCalList: 'photoshop' }];
+    // const adobeGroups = [{ groupName: 'library patron api test', libCalList: 'photoshop' }]; 
+    const adobeGroups = appConf.software.filter(item => item.provider == 'Adobe');
 
     await async.eachOf(adobeGroups, async list => {
-      let response = await adobe.callGroupUsers(list.groupName);
-      adobeUserList[list.groupName] = adobe.getCurrentUsernames(JSON.parse(response));
+      let response = await adobe.callGroupUsers(list.adobeGroupName);
+      adobeUserList[list.adobeGroupName] = adobe.getCurrentUsernames(JSON.parse(response));
 
       // filter libcal response to determine what needs to be added to adobe:
-      var thisLibCalListName = list.libCalList;
-      var thisAdobeListName = list.groupName;
+      var thisLibCalListName = list.shortName;
+      var thisAdobeListName = list.adobeGroupName;
       var thisLibCalList = lcUserList[thisLibCalListName];
       var thisLibCalEmails = lcApi.getEmailsFromBookings(thisLibCalList);
       var thisAdobeList = adobeUserList[thisAdobeListName];
@@ -104,26 +90,22 @@ const async = require('async');
      var jsonBody = [];
 
       if (addToAdobe[thisAdobeListName].length > 0) {
-        // let jsonBody = JSON.stringify(adobe.prepBulkAddFromLibCal2Adobe(addToAdobe[thisAdobeListName], thisAdobeListName));
          jsonBody = jsonBody.concat(adobe.prepBulkAddFromLibCal2Adobe(addToAdobe[thisAdobeListName], thisAdobeListName));
       }
 
       if (revokeFromAdobe[thisAdobeListName].length > 0) {
-        console.log('about to revoke',thisAdobeListName,'for',revokeFromAdobe[thisAdobeListName])
+        console.debug('about to revoke',thisAdobeListName,'for',revokeFromAdobe[thisAdobeListName])
         jsonBody = jsonBody.concat(adobe.prepBulkRevokeFromAdobe(revokeFromAdobe[thisAdobeListName], thisAdobeListName));
       }
-      // console.log(JSON.stringify(jsonBody, null, 4));
 
-      if (jsonBody != []) {
-        // let json = JSON.parse(jsonBody);
+      if (jsonBody.length > 0) {
+        console.debug('Going to submit Json to Adobe:', typeof jsonBody, jsonBody);
         response = await adobe.callSubmitJson(jsonBody);
         console.log(response);
       } else {
         console.log('No update required; none submitted');
       }
     });
-
-    // console.log('Add Adobe Users:', addToAdobe);
   } catch (err) {
     console.error('Cannot get Adobe list:', err);
   }

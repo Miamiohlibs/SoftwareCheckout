@@ -100,7 +100,11 @@ module.exports = class AdobeUserMgmtApi {
   }
 
   getCurrentUsernames(obj) {
+    console.debug('input to getCurrentUsername:',obj);
     let users = obj.users;
+    if (typeof users == 'undefined') { 
+      users = [];
+    }
     return users
       // with status == active
       .filter(item => item.status == 'active')

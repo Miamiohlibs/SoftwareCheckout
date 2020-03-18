@@ -71,14 +71,14 @@ module.exports = class LibCalApi {
 
   }
 
-  mapLibCal2CampusCodes(cids, crosswalk) {
+  mapLibCal2ShortName(cids, crosswalk) {
     // adds a .campusCode property to each LibCal cid element
     // note: the LibCal.name must exactly match the .name property defined in configs/campusIT.js
     // crosswalk should be the .software property of the campusIt configuration, containing a name and shortName
     cids.forEach(libCalElement => {
       crosswalk.map(item => {
         if (libCalElement.name == item.name) {
-          libCalElement.campusCode = item.shortName;
+          libCalElement.shortName = item.shortName;
         }
       })
     });
