@@ -108,11 +108,11 @@ const async = require('async');
          jsonBody = jsonBody.concat(adobe.prepBulkAddFromLibCal2Adobe(addToAdobe[thisAdobeListName], thisAdobeListName));
       }
 
+      if (revokeFromAdobe[thisAdobeListName].length > 0) {
+        console.log('about to revoke',thisAdobeListName,'for',revokeFromAdobe[thisAdobeListName])
+        jsonBody = jsonBody.concat(adobe.prepBulkRevokeFromAdobe(revokeFromAdobe[thisAdobeListName], thisAdobeListName));
+      }
       // console.log(JSON.stringify(jsonBody, null, 4));
-
-        if (revokeFromAdobe.length > 0) {
-          // jsonBody.push(adobe)
-        }
 
       if (jsonBody != []) {
         // let json = JSON.parse(jsonBody);
