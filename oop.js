@@ -77,28 +77,30 @@ const async = require('async');
   // get Adobe user lists
   let adobeUserList = {};
   let addToAdobe = {};
+  let revokeFromAdobe = {};
   try {
-    const adobeGroups = [{ groupName: 'library patron api test', campusList: 'photoshop' }];
+    const adobeGroups = [{ groupName: 'library patron api test', libCalList: 'photoshop' }];
 
     await async.eachOf(adobeGroups, async list => {
       let response = await adobe.callGroupUsers(list.groupName);
       adobeUserList[list.groupName] = adobe.getCurrentUsernames(JSON.parse(response));
 
       // filter libcal response to determine what needs to be added to adobe:
-      var thisLibCalListName = list.campusList;
+      var thisLibCalListName = list.libCalList;
       var thisAdobeListName = list.groupName;
       var thisLibCalList = lcUserList[thisLibCalListName];
+      var thisLibCalEmails = lcApi.getEmailsFromBookings(thisLibCalList);
       var thisAdobeList = adobeUserList[thisAdobeListName];
       console.log(thisLibCalListName, '(libcal):', thisLibCalList.length);
       console.log(thisAdobeListName, '(adobe)', thisAdobeList.length);
 
       addToAdobe[thisAdobeListName] = adobe.filterBookingsToAdd(thisLibCalList, thisAdobeList);
-
-      // deleteFromAdobe[thisAdobeListName] = thisAdobeList.filter(email => )
-
+      revokeFromAdobe[thisAdobeListName] = adobe.filterUsersToRevoke(thisLibCalEmails, thisAdobeList);
 
       console.log('adobeList:', thisAdobeListName, thisAdobeList);
-      console.log('addToAdobe:', addToAdobe)
+      console.log('addToAdobe:', addToAdobe);
+      console.log('revokeFromAdobe:', revokeFromAdobe);
+
       let jsonBody = '';
       if (addToAdobe[thisAdobeListName].length > 0) {
         jsonBody += JSON.stringify(adobe.prepBulkAddFromLibCal2Adobe(addToAdobe[thisAdobeListName], thisAdobeListName));
