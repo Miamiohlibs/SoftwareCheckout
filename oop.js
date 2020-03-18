@@ -105,10 +105,14 @@ const async = require('async');
 
       if (addToAdobe[thisAdobeListName].length > 0) {
         // let jsonBody = JSON.stringify(adobe.prepBulkAddFromLibCal2Adobe(addToAdobe[thisAdobeListName], thisAdobeListName));
-         jsonBody = adobe.prepBulkAddFromLibCal2Adobe(addToAdobe[thisAdobeListName], thisAdobeListName);
+         jsonBody = jsonBody.concat(adobe.prepBulkAddFromLibCal2Adobe(addToAdobe[thisAdobeListName], thisAdobeListName));
       }
 
       // console.log(JSON.stringify(jsonBody, null, 4));
+
+        if (revokeFromAdobe.length > 0) {
+          // jsonBody.push(adobe)
+        }
 
       if (jsonBody != []) {
         // let json = JSON.parse(jsonBody);
