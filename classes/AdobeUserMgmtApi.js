@@ -161,6 +161,7 @@ module.exports = class AdobeUserMgmtApi {
     userList.forEach(item => {
       jsonBody.push(this.createRevokeJsonBody(item, [listName], i));
     });
+    return jsonBody;
   }
 }
 

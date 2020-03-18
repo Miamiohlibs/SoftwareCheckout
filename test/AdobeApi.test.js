@@ -78,25 +78,25 @@ describe('getActionPath', () => {
   });
 
   it('should return a valid path with args: action, argument', () => {
-    let response = api.getActionPath('users','myarg');
+    let response = api.getActionPath('users', 'myarg');
     let expected = expect.stringMatching(/^\/v2\/usermanagement\/users\/.*@AdobeOrg\/0\/myarg\?/);
     expect(response).toEqual(expected);
   });
 
   it('should return a valid path with args: action, argument, page', () => {
-    let response = api.getActionPath('users','myarg',2);
+    let response = api.getActionPath('users', 'myarg', 2);
     let expected = expect.stringMatching(/^\/v2\/usermanagement\/users\/.*@AdobeOrg\/2\/myarg\?/);
     expect(response).toEqual(expected);
   });
 
   it('should return a valid path with args: action, null, page', () => {
-    let response = api.getActionPath('users',null,2);
+    let response = api.getActionPath('users', null, 2);
     let expected = expect.stringMatching(/^\/v2\/usermanagement\/users\/.*@AdobeOrg\/2\?/);
     expect(response).toEqual(expected);
   });
 
   it('should return a valid path with args: action, argument, null', () => {
-    let response = api.getActionPath('users','myarg',null);
+    let response = api.getActionPath('users', 'myarg', null);
     let expected = expect.stringMatching(/^\/v2\/usermanagement\/users\/.*@AdobeOrg\/0\/myarg\?/);
     expect(response).toEqual(expected);
   });
@@ -108,15 +108,15 @@ describe('getActionPath', () => {
   });
 
   it('should throw an error with no args', () => {
-    function noArgs () {
+    function noArgs() {
       api.getActionPath();
     }
     expect(noArgs).toThrowError(Error);
   });
 
   it('should return an error with non-integer page arg', () => {
-    function hamsterMany () {
-      api.getActionPath('generic',null,'hamster');
+    function hamsterMany() {
+      api.getActionPath('generic', null, 'hamster');
     }
     expect(hamsterMany).toThrowError(Error);
   });
@@ -156,9 +156,9 @@ describe('filterUsersToRevoke', () => {
 describe('createAddJsonBody', () => {
   beforeEach(async () => {
     api = new AdobeUserMgmtApi(realConf);
-    response = api.createAddJsonBody('fakeuser@miamioh.edu','US','Fake','User', ['fake user group1', 'fake group 2']);
+    response = api.createAddJsonBody('fakeuser@miamioh.edu', 'US', 'Fake', 'User', ['fake user group1', 'fake group 2']);
   });
-  it('should build an object with createFederatedId and add functions', () => { 
+  it('should build an object with createFederatedId and add functions', () => {
     expect(typeof response).toBe('object');
     expect(response.user).toBe('fakeuser@miamioh.edu');
     expect(response.requestID).toBe('action_1');
@@ -167,15 +167,15 @@ describe('createAddJsonBody', () => {
     expect(response.do[0]).toHaveProperty('add');
   });
 
-  it('should give createFederatedId the appropriate fields', () => { 
-    expect(response.do[0].createFederatedID).toHaveProperty('email','fakeuser@miamioh.edu')
-    expect(response.do[0].createFederatedID).toHaveProperty('country','US');
-    expect(response.do[0].createFederatedID).toHaveProperty('firstname','Fake');
-    expect(response.do[0].createFederatedID).toHaveProperty('lastname','User');
-    expect(response.do[0].createFederatedID).toHaveProperty('option','ignoreIfAlreadyExists');
+  it('should give createFederatedId the appropriate fields', () => {
+    expect(response.do[0].createFederatedID).toHaveProperty('email', 'fakeuser@miamioh.edu')
+    expect(response.do[0].createFederatedID).toHaveProperty('country', 'US');
+    expect(response.do[0].createFederatedID).toHaveProperty('firstname', 'Fake');
+    expect(response.do[0].createFederatedID).toHaveProperty('lastname', 'User');
+    expect(response.do[0].createFederatedID).toHaveProperty('option', 'ignoreIfAlreadyExists');
   });
 
-  it('should give "add" the apprpriate fields', () => { 
+  it('should give "add" the apprpriate fields', () => {
     expect(response.do[0].add).toHaveProperty('group');
     expect(response.do[0].add.group).toBeInstanceOf(Array);
     expect(response.do[0].add.group[0]).toBe('fake user group1');
@@ -186,12 +186,12 @@ describe('createAddJsonBody', () => {
 describe('createRevokeJsonBody', () => {
   beforeEach(async () => {
     api = new AdobeUserMgmtApi(realConf);
-    response = api.createRevokeJsonBody('fakeuser@miamioh.edu',['fake user group1', 'fake group 2'], 1000);
+    response = api.createRevokeJsonBody('fakeuser@miamioh.edu', ['fake user group1', 'fake group 2'], 1000);
   });
-  it('should build an object with remove functions', () => { 
+  it('should build an object with remove functions', () => {
     expect(typeof response).toBe('object');
-    expect(response).toHaveProperty('user','fakeuser@miamioh.edu');
-    expect(response).toHaveProperty('requestID','revoke_1000');
+    expect(response).toHaveProperty('user', 'fakeuser@miamioh.edu');
+    expect(response).toHaveProperty('requestID', 'revoke_1000');
     expect(response).toHaveProperty('do');
   });
   it('should have the appropriate structure in the "do" property', () => {
@@ -206,7 +206,7 @@ describe('createRevokeJsonBody', () => {
 })
 
 describe('prepBulkAddFromLibCal2Adobe', () => {
-  beforeEach( () => {
+  beforeEach(() => {
     api = new AdobeUserMgmtApi(realConf);
     response = api.prepBulkAddFromLibCal2Adobe(bookingsToAdd);
   });
@@ -215,9 +215,22 @@ describe('prepBulkAddFromLibCal2Adobe', () => {
     expect(response).toBeInstanceOf(Array);
     expect(typeof response[0]).toBe('object');
     expect(response.length).toBe(2);
+    expect(response[0]).toHaveProperty('user', 'fakeuser@miamioh.edu');
+    expect(response[1]).toHaveProperty('user', 'bogususer@miamioh.edu');
+  });
+});
+
+describe('prepBulkRevokeFromAdobe', () => {
+  beforeEach(() => {
+    api = new AdobeUserMgmtApi(realConf);
+    let userList = ['fakeuser@miamioh.edu', 'bogususer@miamioh.edu'];
+    let listName = 'test list';
+    response = api.prepBulkRevokeFromAdobe(userList, listName);
+  });
+  it('should return an array of revoke requests for two people', () => {
+    expect(response).toBeInstanceOf(Array);
+    expect(response.length).toBe(2);
     expect(response[0]).toHaveProperty('user','fakeuser@miamioh.edu');
     expect(response[1]).toHaveProperty('user','bogususer@miamioh.edu');
-  });
-
-
-})
+  })
+});
