@@ -143,6 +143,16 @@ describe('filterBookingsToAdd', () => {
   expect(remaining[0].email).toBe('fakeuser@miamioh.edu');
 })
 
+describe('filterUsersToRevoke', () => {
+  api = new AdobeUserMgmtApi(realConf);
+  let libCalList = ['user1@gmail.com', 'user2@gmail.com'];
+  let adobeList = ['user1@gmail.com', 'user2@gmail.com', 'user3@gmail.com'];
+  let revokeList = api.filterUsersToRevoke(libCalList, adobeList);
+  expect(revokeList).toBeInstanceOf(Array);
+  expect(revokeList.length).toBe(1);
+  expect(revokeList[0]).toBe('user3@gmail.com');
+})
+
 describe('createAddJsonBody', () => {
   beforeEach(async () => {
     api = new AdobeUserMgmtApi(realConf);
@@ -157,7 +167,7 @@ describe('createAddJsonBody', () => {
     expect(response.do[0]).toHaveProperty('add');
   });
 
-  it('should give createFederatedId the apprpriate fields', () => { 
+  it('should give createFederatedId the appropriate fields', () => { 
     expect(response.do[0].createFederatedID).toHaveProperty('email','fakeuser@miamioh.edu')
     expect(response.do[0].createFederatedID).toHaveProperty('country','US');
     expect(response.do[0].createFederatedID).toHaveProperty('firstname','Fake');
@@ -173,6 +183,28 @@ describe('createAddJsonBody', () => {
   });
 });
 
+describe('createRevokeJsonBody', () => {
+  beforeEach(async () => {
+    api = new AdobeUserMgmtApi(realConf);
+    response = api.createRevokeJsonBody('fakeuser@miamioh.edu',['fake user group1', 'fake group 2'], 1000);
+  });
+  it('should build an object with remove functions', () => { 
+    expect(typeof response).toBe('object');
+    expect(response).toHaveProperty('user','fakeuser@miamioh.edu');
+    expect(response).toHaveProperty('requestID','revoke_1000');
+    expect(response).toHaveProperty('do');
+  });
+  it('should have the appropriate structure in the "do" property', () => {
+    expect(response.do).toBeInstanceOf(Array);
+    expect(response.do.length).toBe(1);
+    expect(response.do[0]).toHaveProperty('remove');
+    expect(response.do[0].remove).toHaveProperty('group');
+    expect(response.do[0].remove.group).toBeInstanceOf(Array);
+    expect(response.do[0].remove.group[0]).toBe('fake user group1');
+    expect(response.do[0].remove.group[1]).toBe('fake group 2');
+  });
+})
+
 describe('prepBulkAddFromLibCal2Adobe', () => {
   beforeEach( () => {
     api = new AdobeUserMgmtApi(realConf);
@@ -186,5 +218,6 @@ describe('prepBulkAddFromLibCal2Adobe', () => {
     expect(response[0]).toHaveProperty('user','fakeuser@miamioh.edu');
     expect(response[1]).toHaveProperty('user','bogususer@miamioh.edu');
   });
+
 
 })

@@ -116,6 +116,10 @@ module.exports = class AdobeUserMgmtApi {
     return libCalList.filter(user => ! adobeList.includes(user.email));
   }
 
+  filterUsersToRevoke(libCalEmails, adobeEmails) {
+    return adobeEmails.filter(email => ! libCalEmails.includes(email));
+  }
+
   createAddJsonBody(user, country, firstName, lastName, groups, n=1) {
     let doObj = [{
       'createFederatedID': {
@@ -140,6 +144,23 @@ module.exports = class AdobeUserMgmtApi {
       i++;
     });
     return jsonBody;
+  }
+
+  createRevokeJsonBody(user, groups, n=1000) {
+    let doObj = [{
+        remove : {
+          group: groups
+        }
+      }];
+    return { user: user, requestID: 'revoke_'+n, do: doObj }
+  }
+
+  prepBulkRevokeFromAdobe(userList, listName) {
+    let i = 1000;
+    let jsonBody = [];
+    userList.forEach(item => {
+      jsonBody.push(this.createRevokeJsonBody(item, [listName], i));
+    });
   }
 }
 
