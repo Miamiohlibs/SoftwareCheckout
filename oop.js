@@ -101,16 +101,18 @@ const async = require('async');
       console.log('addToAdobe:', addToAdobe);
       console.log('revokeFromAdobe:', revokeFromAdobe);
 
-      let jsonBody = '';
+     var jsonBody = [];
+
       if (addToAdobe[thisAdobeListName].length > 0) {
-        jsonBody += JSON.stringify(adobe.prepBulkAddFromLibCal2Adobe(addToAdobe[thisAdobeListName], thisAdobeListName));
+        // let jsonBody = JSON.stringify(adobe.prepBulkAddFromLibCal2Adobe(addToAdobe[thisAdobeListName], thisAdobeListName));
+         jsonBody = adobe.prepBulkAddFromLibCal2Adobe(addToAdobe[thisAdobeListName], thisAdobeListName);
       }
 
       // console.log(JSON.stringify(jsonBody, null, 4));
 
-      if (jsonBody != '') {
-        let json = JSON.parse(jsonBody);
-        response = await adobe.callSubmitJson(json);
+      if (jsonBody != []) {
+        // let json = JSON.parse(jsonBody);
+        response = await adobe.callSubmitJson(jsonBody);
         console.log(response);
       } else {
         console.log('No update required; none submitted');
