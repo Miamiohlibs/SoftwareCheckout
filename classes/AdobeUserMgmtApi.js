@@ -8,14 +8,12 @@ module.exports = class AdobeUserMgmtApi {
     this.credentials = conf.credentials;
     this.queryConf = conf.queryConf;
     this.credentials.privateKey = fs.readFileSync(path.join(__dirname, conf.certs.privateKeyFile), 'utf8');
-    // this.credentials.privateKey = this.privateKey;
   }
 
   async getToken() {
     let tokenResponse = await jwtAuth(this.credentials);
     this.accessToken = tokenResponse.access_token;
     return tokenResponse.access_token;
-    // this.accessToken = tokenResponse;
   }
 
   // start with a basic set of options, add or overwrite with new options
@@ -39,7 +37,6 @@ module.exports = class AdobeUserMgmtApi {
     if (typeof tmpHeaders !== 'undefined') {
       this.currOpts.headers = Object.assign(this.currOpts.headers, tmpHeaders);
     }
-
   }
 
   getActionPath(action, argument = null, page = 0) {

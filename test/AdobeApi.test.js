@@ -34,7 +34,6 @@ describe('Queries', () => {
 
   it('should add Auth and x-api-key headers using querySetup("generic") with no other arguments', () => {
     var genericOpts = api.queryConf.generic.options;
-    // console.log('genericOpts', api.queryConf.generic.options);
     const originalHeadersLength = Object.keys(genericOpts.headers).length;
     api.querySetup('generic');
     expect(api.currOpts).toHaveProperty('headers');
@@ -47,7 +46,6 @@ describe('Queries', () => {
 
   it('should add Auth and x-api-key headers using querySetup() with extra arguments', () => {
     var genericOpts = api.queryConf.generic.options;
-    // console.log('genericOpts', api.queryConf.generic.options);
     const originalHeadersLength = Object.keys(genericOpts.headers).length;
     api.querySetup('generic', { fake: 'aardvark', bogus: 'pangolin' });
     expect(api.currOpts).toHaveProperty('fake', 'aardvark');
@@ -122,6 +120,11 @@ describe('getActionPath', () => {
   });
 });
 
+
+// This test uses live data and is only correct when we've set up a list to match its output
+// Not useful for testing most of the time
+// If you want to test this function, set the "expect response toBe" line to the expected value
+
 // describe('getCurrentUsernames', () => {
 //   beforeEach(async () => {
 //     api = new AdobeUserMgmtApi(realConf);
@@ -141,7 +144,7 @@ describe('filterBookingsToAdd', () => {
   expect(remaining).toBeInstanceOf(Array);
   expect(remaining.length).toBe(1);
   expect(remaining[0].email).toBe('fakeuser@miamioh.edu');
-})
+});
 
 describe('filterUsersToRevoke', () => {
   api = new AdobeUserMgmtApi(realConf);
@@ -151,7 +154,7 @@ describe('filterUsersToRevoke', () => {
   expect(revokeList).toBeInstanceOf(Array);
   expect(revokeList.length).toBe(1);
   expect(revokeList[0]).toBe('user3@gmail.com');
-})
+});
 
 describe('createAddJsonBody', () => {
   beforeEach(async () => {
@@ -203,7 +206,7 @@ describe('createRevokeJsonBody', () => {
     expect(response.do[0].remove.group[0]).toBe('fake user group1');
     expect(response.do[0].remove.group[1]).toBe('fake group 2');
   });
-})
+});
 
 describe('prepBulkAddFromLibCal2Adobe', () => {
   beforeEach(() => {
@@ -232,5 +235,5 @@ describe('prepBulkRevokeFromAdobe', () => {
     expect(response.length).toBe(2);
     expect(response[0]).toHaveProperty('user','fakeuser@miamioh.edu');
     expect(response[1]).toHaveProperty('user','bogususer@miamioh.edu');
-  })
+  });
 });
