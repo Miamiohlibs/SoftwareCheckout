@@ -85,14 +85,14 @@ const async = require('async');
       adobeUserList[list.groupName] = adobe.getCurrentUsernames(JSON.parse(response));
 
       // filter libcal response to determine what needs to be added to adobe:
-      var thisCampusListName = list.campusList;
+      var thisLibCalListName = list.campusList;
       var thisAdobeListName = list.groupName;
-      var thisCampusList = lcUserList[thisCampusListName];
+      var thisLibCalList = lcUserList[thisLibCalListName];
       var thisAdobeList = adobeUserList[thisAdobeListName];
-      console.log(thisCampusListName, '(libcal):', thisCampusList.length);
+      console.log(thisLibCalListName, '(libcal):', thisLibCalList.length);
       console.log(thisAdobeListName, '(adobe)', thisAdobeList.length);
 
-      addToAdobe[thisAdobeListName] = adobe.filterBookingsToAdd(thisCampusList, thisAdobeList);
+      addToAdobe[thisAdobeListName] = adobe.filterBookingsToAdd(thisLibCalList, thisAdobeList);
 
       // deleteFromAdobe[thisAdobeListName] = thisAdobeList.filter(email => )
 
