@@ -5,12 +5,31 @@ const appConf = require('./config/appConf');
 const adobeConf = require('./config/adobe');
 const AdobeApi = require('./classes/AdobeUserMgmtApi');
 const async = require('async');
+const express = require('express');
+const moment = require('moment');
+const utils = require('./scripts/utils');
 
 // uncomment this line to suppress debug messages
 console.debug = ()=>{};
 
-(async () => {
-  const startTime = new Date().getTime();
+const myArgs = process.argv.slice(2);
+if (myArgs.includes('--listen')) {
+  const app = express();
+  const port = appConf.nodePort || 9000;
+  app.get('/', (req, res) => {
+    TheBusiness();
+    res.send('Updating permissions groups at: ' + moment().format('YYYY-MM-DD HH:mm:ss'));
+  });
+  app.listen(port, () => console.log(`SoftwareCheckout app listening on port ${port}!`));
+}
+
+// on startup, run TheBusiness once, then wait for subsequent Express requests
+TheBusiness();
+
+
+
+async function TheBusiness () {
+  utils.Divider();
 
   // Get LibCal Token
   try {
@@ -100,11 +119,11 @@ console.debug = ()=>{};
         console.log(response);
       } else {
         console.log('No update required; none submitted');
+        console.log('Finished update at:', moment().format('YYYY-MM-DD HH:mm:ss'));
+        utils.Divider();
       }
     });
   } catch (err) {
     console.error('Cannot get Adobe list:', err);
   }
-
-
-})();
+}
