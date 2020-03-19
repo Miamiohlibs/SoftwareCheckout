@@ -138,7 +138,6 @@ describe('query execution with post variables', () => {
   });
   it('should return a JSON object with ', async () => {
     const q = await api.execute();
-    console.log(q)
     const obj = await JSON.parse(q); 
     expect(typeof q).toBe('string');
     expect(typeof obj).toBe('object'); 
