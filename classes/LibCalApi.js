@@ -1,4 +1,4 @@
-const query = require('../scripts/httpQuery')
+const Query = require('./Query');
 
 // uncomment this line to suppress debug messages
 console.debug = ()=>{};
@@ -43,10 +43,9 @@ module.exports = class LibCalApi {
     console.debug(this.conf.queryConfig.options.path, this.token)
     // get a promise for each call
     try {
-      var promise = await query(this.conf.queryConfig).then((response) => {
-        return (response);
-      });
-      return promise;
+      let query = new Query(this.conf.queryConfig);
+      let response = await query.execute();
+      return response;
     } catch {
       console.error('failed to get libcal query')
     }
@@ -72,7 +71,6 @@ module.exports = class LibCalApi {
     } catch (err) {
       console.log('Error getting LibCal lists:', err);
     }
-
   }
 
   mapLibCal2ShortName(cids, crosswalk) {
@@ -102,14 +100,11 @@ module.exports = class LibCalApi {
     });
     // limit to confirmed bookings (not cancelled, etc)
     return currentBookings.filter(obj => { return obj.status === 'Confirmed' });
-
-
   }
 
   getEmailsFromBookings(bookings) {
     return bookings.map(item => { return item.email });
   }
-
 
   async asyncForEach(array, callback) {
     // asyncForEach 
@@ -119,6 +114,5 @@ module.exports = class LibCalApi {
       await callback(array[index], index, array);
     }
   }
-
 }
 
