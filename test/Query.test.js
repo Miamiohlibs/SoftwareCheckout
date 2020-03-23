@@ -27,21 +27,25 @@ const genericJSON = {
     }
   }
 }
-const postJSON = {
+
+const postJsonPlaceholder = {
   queryConf: {
     options: {
-      hostname: 'ulblwebt03.lib.miamioh.edu',
+      hostname: 'jsonplaceholder.typicode.com',
       port: 443,
-      path: '/~irwinkr/json_in_json_out.php', //set at query time
+      path: '/posts',
       method: 'POST',
       headers: {
-        'Content-type': 'application/json'
+        'Content-type': 'application/json; charset=UTF-8'
       }
     }
   }
 }
-
-const postData = { 'in': 'garbage' }
+const postDataJSP = {
+  title: 'foo',
+  body: 'bar',
+  userId: 1
+}
 
 beforeEach(() => {
   setQueryConfMock = jest.fn();
@@ -104,7 +108,7 @@ describe('set config after blank setup', () => {
   });
 
   it('should take a data setting using setAuth', () => {
-    incremental.setAuth({test:'authorization'});
+    incremental.setAuth({ test: 'authorization' });
     expect(incremental).not.toHaveProperty('queryConf');
     expect(incremental).toHaveProperty('auth');
     expect(incremental).not.toHaveProperty('data');
@@ -129,18 +133,21 @@ describe('set config after blank setup', () => {
 //     expect(typeof obj).toBe('object');
 //     expect(obj).toHaveProperty('info');
 //     expect(obj).toHaveProperty('results');
-//   })
+//   });
 // });
 
-describe('query execution with post variables', () => { 
+describe('query execution with post variables', () => {
   beforeEach(() => {
-    api = new Query(postJSON.queryConf, null, postData);
+    api = new Query(postJsonPlaceholder.queryConf, null, postDataJSP);
   });
   it('should return a JSON object with ', async () => {
     const q = await api.execute();
-    const obj = await JSON.parse(q); 
+    const obj = await JSON.parse(q);
     expect(typeof q).toBe('string');
-    expect(typeof obj).toBe('object'); 
-    expect(obj).toHaveProperty('out','garbage');
+    expect(typeof obj).toBe('object');
+    expect(obj).toHaveProperty('title', 'foo');
+    expect(obj).toHaveProperty('body', 'bar');
+    expect(obj).toHaveProperty('userId', 1);
+    expect(obj).toHaveProperty('id');
   })
 });
