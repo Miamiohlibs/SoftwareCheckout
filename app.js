@@ -10,7 +10,7 @@ const moment = require('moment');
 const utils = require('./scripts/utils');
 
 // uncomment this line to suppress debug messages
-console.debug = ()=>{};
+console.debug = () => { };
 
 const myArgs = process.argv.slice(2);
 if (myArgs.includes('--listen')) {
@@ -26,7 +26,7 @@ if (myArgs.includes('--listen')) {
 // on startup, run TheBusiness once, then wait for subsequent Express requests
 TheBusiness();
 
-async function TheBusiness () {
+async function TheBusiness() {
   utils.Divider();
 
   // Get LibCal Token
@@ -55,7 +55,7 @@ async function TheBusiness () {
     console.debug(JSON.stringify(lcSoftware, null, 4));
 
     await async.eachOf(lcSoftware, async software => {
-      if (software.bookings.length > 0) { 
+      if (software.bookings.length > 0) {
         let lcBookings = lcApi.getCurrentLibCalBookings(software.bookings)
         console.debug('LibCal bookings:', software.shortName, lcBookings);
         lcUserList[software.shortName] = lcBookings;
@@ -72,8 +72,11 @@ async function TheBusiness () {
   let addToAdobe = {};
   let revokeFromAdobe = {};
   try {
-    // const adobeGroups = [{ groupName: 'library patron api test', libCalList: 'photoshop' }]; 
-    const adobeGroups = appConf.software.filter(item => item.provider == 'Adobe');
+    const adobeGroupsData = adobe.getAdobeLists(appConf.software);
+    const adobeGroups = adobeGroupsData.groups;
+    if (adobeGroupsData.hasOwnProperty('errors')) {
+      console.error('Errors in appConf.js:',adobeGroupsData.errors);
+    }
 
     await async.eachOf(adobeGroups, async list => {
       let response = await adobe.callGroupUsers(list.adobeGroupName);
@@ -100,14 +103,14 @@ async function TheBusiness () {
       console.log('addToAdobe:', addToAdobe);
       console.log('revokeFromAdobe:', revokeFromAdobe);
 
-     var jsonBody = [];
+      var jsonBody = [];
 
       if (addToAdobe[thisAdobeListName].length > 0) {
-         jsonBody = jsonBody.concat(adobe.prepBulkAddFromLibCal2Adobe(addToAdobe[thisAdobeListName], thisAdobeListName));
+        jsonBody = jsonBody.concat(adobe.prepBulkAddFromLibCal2Adobe(addToAdobe[thisAdobeListName], thisAdobeListName));
       }
 
       if (revokeFromAdobe[thisAdobeListName].length > 0) {
-        console.debug('about to revoke',thisAdobeListName,'for',revokeFromAdobe[thisAdobeListName])
+        console.debug('about to revoke', thisAdobeListName, 'for', revokeFromAdobe[thisAdobeListName])
         jsonBody = jsonBody.concat(adobe.prepBulkRevokeFromAdobe(revokeFromAdobe[thisAdobeListName], thisAdobeListName));
       }
 
