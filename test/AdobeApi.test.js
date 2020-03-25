@@ -22,9 +22,12 @@ describe('Initialization', () => {
 })
 
 describe('getAdobeLists', () => {
-  api = new AdobeUserMgmtApi(realConf);
-  it('should return only one object from the sample conf: Adobe Photoshop', () => {
-    const response = api.getAdobeLists(appConfMissingStuff.software);
+  beforeEach(() => {
+    api = new AdobeUserMgmtApi(realConf);
+  });
+
+  it('should return only one object from the Mixed sample conf: Adobe Photoshop', () => {
+    const response = api.getAdobeLists(appConfMissingStuff.softwareMixed);
     expect(typeof response).toBe('object');
     expect(response).toHaveProperty('groups');
     expect(response).toHaveProperty('errors');
@@ -33,6 +36,17 @@ describe('getAdobeLists', () => {
     expect(response.errors).toBeInstanceOf(Array);
     expect(response.errors.length).toBe(2);
     expect(response.groups[0]).toHaveProperty('name','Adobe Photoshop');
+  });
+
+  it('should return two objects and no errors from the Good sample conf', () => {
+    const response = api.getAdobeLists(appConfMissingStuff.softwareAllGood);
+    expect(typeof response).toBe('object');
+    expect(response).toHaveProperty('groups');
+    expect(response).not.toHaveProperty('errors');
+    expect(response.groups).toBeInstanceOf(Array);
+    expect(response.groups.length).toBe(2);
+    expect(response.groups[0]).toHaveProperty('name','Adobe Photoshop');
+    expect(response.groups[1]).toHaveProperty('name','Adobe Illustrator');
   });
 });
 
