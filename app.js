@@ -72,12 +72,16 @@ async function TheBusiness() {
   let addToAdobe = {};
   let revokeFromAdobe = {};
   try {
+    // get the configs connecting Adobe and LibCal list names
     const adobeGroupsData = adobe.getAdobeLists(appConf.software);
     const adobeGroups = adobeGroupsData.groups;
     if (adobeGroupsData.hasOwnProperty('errors')) {
       console.error('Errors in appConf.js:',adobeGroupsData.errors);
     }
 
+    // foreach adobe list, get members and compare against libcal list
+    // revoke any users not in the libcal list
+    // add any members not in the adobe list
     await async.eachOf(adobeGroups, async list => {
       let response = await adobe.callGroupUsers(list.adobeGroupName);
       if (! JSON.parse(response).hasOwnProperty('result') || JSON.parse(response).result != 'success') {
@@ -121,11 +125,13 @@ async function TheBusiness() {
         console.log(response);
       } else {
         console.log('No update required; none submitted');
-        console.log('Finished update at:', moment().format('YYYY-MM-DD HH:mm:ss'));
-        utils.Divider();
       }
     });
   } catch (err) {
     console.error('Cannot get Adobe list:', err);
   }
+
+  // finally, log when the script finishes
+  console.log('Finished update at:', moment().format('YYYY-MM-DD HH:mm:ss'));
+  utils.Divider();
 }
