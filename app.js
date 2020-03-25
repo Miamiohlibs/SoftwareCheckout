@@ -1,19 +1,21 @@
-const fs = require('fs');
-const path = require('path');
-const query = require('./scripts/httpQuery');
-const campusOptions = require('./config/campusIT');
+// this is the OOP version of app.js, in progress
+const LibCalApi = require('./classes/LibCalApi');
+const libCalConf = require('./config/libCal');
+const appConf = require('./config/appConf');
+const adobeConf = require('./config/adobe');
+const AdobeApi = require('./classes/AdobeUserMgmtApi');
+const async = require('async');
 const express = require('express');
 const moment = require('moment');
-const libCal = require('./scripts/libCal.js');
-const campus = require('./scripts/campus');
 const utils = require('./scripts/utils');
 
-const startTime = new Date().getTime();
+// uncomment this line to suppress debug messages
+console.debug = () => { };
 
 const myArgs = process.argv.slice(2);
 if (myArgs.includes('--listen')) {
   const app = express();
-  const port = campusOptions.nodePort || 9000;
+  const port = appConf.nodePort || 9000;
   app.get('/', (req, res) => {
     TheBusiness();
     res.send('Updating permissions groups at: ' + moment().format('YYYY-MM-DD HH:mm:ss'));
@@ -24,133 +26,113 @@ if (myArgs.includes('--listen')) {
 // on startup, run TheBusiness once, then wait for subsequent Express requests
 TheBusiness();
 
-function TheBusiness() {
+async function TheBusiness() {
   utils.Divider();
-  console.log('Starting update at:', moment().format('YYYY-MM-DD HH:mm:ss'));
 
-  // Initiate Campus Requests
-  let campusPromises = new Promise((resolve, reject) => {
-    // Get the Campus IT Token
-    // console.log(campusOptions.connectConfig);
-    query(campusOptions.connectConfig).then(values => { // Query returns is a Promise too
-      campusToken = JSON.parse(values);
-      campusOptions.queryConfig.get.options.headers.Authorization = campusToken.data.token;
-      campusLists = campus.getCampusLists(); // campusLists has properties "promises" and "index"
-      Promise.all(campusLists.promises).then(values => {
-        const obj = {};
-        for (var i = 0; i < values.length; i++) {
-          if (values[i] === 'failed') {
-            // this error is re-iterated later too
-            console.error('Warning: Failed to retreive campus list for: ', campusLists.index[i]);
-          } else {
-            obj[campusLists.index[i]] = values[i];
-          }
-        }
-        resolve(obj);
-      })
-        .catch((error) => {
-          console.error('Failed to get Campus info: ', error)
-        });
-    });
-  });
+  // Get LibCal Token
+  try {
+    lcApi = new LibCalApi(libCalConf);
+    const lcToken = await lcApi.getToken();
+    console.debug('LibCal token:', lcToken)
+  } catch {
+    console.error('Unable to get LibCal Token');
+  }
 
-  // Initiate LibCal Requests
-  let libCalPromises = new Promise((resolve, reject) => {
-    const { oauth2, getToken, libCalOptions } = require('./scripts/libCalAuth');
+  // get Adobe Token
+  const adobe = new AdobeApi(adobeConf);
+  try {
+    await adobe.getToken();
+    console.debug('Adobe token:', adobe.accessToken);
+  } catch (err) {
+    console.error('Unable to get Adobe token:', err)
+  }
 
-    // With Token, make API calls
-    topLevel = getToken().then(values => {
-      const libCalToken = values.access_token;
-      bookingPromises = libCal.getLibCalLists(libCalToken, libCalOptions).then((promises) => {
-        return Promise.all(promises).then(values => {
-          // console.log(values)
-          libCalBooking = [];
-          // Log bookings data from LibCal API
-          let logOpener = '\n=======================================\n'
-            + 'Updated: ' + moment().format('YYYY-MM-DD HH:mm:ss') + '\n';
-          let bookingLog = logOpener;
-          values.forEach(obj => {
-            bookingLog += '\n' + obj.cid + ' : ' + obj.name + '\n';
-            bookingLog += JSON.stringify(obj.bookings, null, '\t') + '\n';
-            libCalBooking.push(obj.bookings);
-          }); // end foreach obj
-          let categoryLog = logOpener + JSON.stringify(values[0], null, '\t');
-          fs.writeFile('logs/bookings.log', bookingLog, (error) => { if (error) throw error });
-          fs.writeFile('logs/categories.log', categoryLog, (error) => { if (error) throw error });
-          libCalInfo = { categories: values[0].categories, bookings: libCalBooking.flat(1) }
-          // console.log(libCalInfo)
-          return libCalInfo;
-        }) // end Promise.all(promises)
-      })
-        .catch(err => { console.error('Failed to return booking promises:', err) }); // end then / after libcal.getLibCalLists
-      return bookingPromises;
-    });
-    resolve(topLevel)
-    return topLevel;
-  });
+  // Get LibCal Lists
+  let lcUserList = {};
+  try {
+    let lcSoftware = await lcApi.getLibCalLists();
+    lcSoftware = lcApi.mapLibCal2ShortName(lcSoftware, appConf.software);
+    console.debug(JSON.stringify(lcSoftware, null, 4));
 
-  // Compare results of Campus and LibCal results
-  Promise.all([campusPromises, libCalPromises]).then((values) => {
-    //console.log(values)
-    bookings = [];
-    bookingPromises = [];
-    campusP = values[0];
-    libcalP = values[1];
-    // console.log(libcalP);
-    cids = libcalP.categories.categories;
-    // console.log(libcal.bookings)
-    // for each LibCal category, match it with the campus shortname defined in campusIT.js
-    // note: the LibCal.name must exactly match the .name property defined in campusIT.js
-    cids.forEach(libCalElement => {
-      campusOptions.software.map(item => {
-        if (libCalElement.name == item.name) {
-          libCalElement.campuscode = item.shortName;
-        }
-      })
-    });
-    cids.forEach(element => {
-      var soft = element.campuscode;
-      bookingPromises[soft] = new Promise((resolve, reject) => {
-        // return books for that software category ("category" == "software package", etc); return only uniqueID, not full email
-        // so far, no limiting by checkout dates -- NEED TO DO THAT
-        // console.log('Libcal bookings', libcal.bookings)
-
-        // only look at bookings in the current category (cid)
-        let category_bookings = libcalP.bookings.filter(obj => { return obj.cid === element.cid });
-
-        // limit to current bookings (not future bookings)
-        let current_bookings = category_bookings.filter(obj => {
-          let toDate = Date.parse(obj.toDate);
-          let fromDate = Date.parse(obj.fromDate);
-          return ((Date.now() > fromDate) && (Date.now() < toDate))
-        });
-
-        // limit to confirmed bookings (not cancelled, etc)
-        let confirmed_bookings = current_bookings.filter(obj => { return obj.status === 'Confirmed' });
-        // convert email addresses to uniqueIds
-        emailPromises = confirmed_bookings.map(item => { return campus.convertEmailToUniq(item.email) });
-        Promise.all(emailPromises).then(data => {
-          bookings[element.campuscode] = data;
-          // console.log('Time elapsed:', new Date().getTime() - startTime);
-          // console.log('In process: ',bookings)
-        }).then( () => { 
-          resolve();
-        })
-        
-
-      });
+    await async.eachOf(lcSoftware, async software => {
+      if (software.bookings.length > 0) {
+        let lcBookings = lcApi.getCurrentLibCalBookings(software.bookings)
+        console.debug('LibCal bookings:', software.shortName, lcBookings);
+        lcUserList[software.shortName] = lcBookings;
+      }
     });
 
-    Promise.all([ bookingPromises['photoshop'], bookingPromises['adobecc'], bookingPromises['illustrator'] ]).then(() => {
-      console.log('Time elapsed:', new Date().getTime() - startTime);
-      console.log('LibCal Bookings: ', bookings);
-      console.log('Campus Lists:', campusP)
-      campus.UpdateGroupMembers(bookings, campusP);
-    }).then(() => {
-      console.log('Finished update at:', moment().format('YYYY-MM-DD HH:mm:ss'));
-      utils.Divider();
+    console.log('LibCal bookings:', lcUserList);
+  } catch (err) {
+    console.error('Error getting LibCal lists:', err);
+  }
+
+  // get Adobe user lists, compare to libCal, update Adobe as appropriate
+  let adobeUserList = {};
+  let addToAdobe = {};
+  let revokeFromAdobe = {};
+  try {
+    // get the configs connecting Adobe and LibCal list names
+    const adobeGroupsData = adobe.getAdobeLists(appConf.software);
+    const adobeGroups = adobeGroupsData.groups;
+    if (adobeGroupsData.hasOwnProperty('errors')) {
+      console.error('Errors in appConf.js:',adobeGroupsData.errors);
+    }
+
+    // foreach adobe list, get members and compare against libcal list
+    // revoke any users not in the libcal list
+    // add any members not in the adobe list
+    await async.eachOf(adobeGroups, async list => {
+      let response = await adobe.callGroupUsers(list.adobeGroupName);
+      if (! JSON.parse(response).hasOwnProperty('result') || JSON.parse(response).result != 'success') {
+        console.error('Error reading Adobe group in:', list);
+        console.error('One or more needed values may not be set');
+        console.error('Raw response:', response);
+      }
+      // console.debug('list for:',list.adobeGroupName);
+      adobeUserList[list.adobeGroupName] = adobe.getCurrentUsernames(JSON.parse(response));
+
+      // filter libcal response to determine what needs to be added to adobe:
+      var thisLibCalListName = list.shortName;
+      var thisAdobeListName = list.adobeGroupName;
+      var thisLibCalList = lcUserList[thisLibCalListName];
+      var thisLibCalEmails = lcApi.getEmailsFromBookings(thisLibCalList);
+      var thisAdobeList = adobeUserList[thisAdobeListName];
+      console.log(thisLibCalListName, '(libcal):', thisLibCalList.length);
+      console.log(thisAdobeListName, '(adobe)', thisAdobeList.length);
+
+      addToAdobe[thisAdobeListName] = adobe.filterBookingsToAdd(thisLibCalList, thisAdobeList);
+      revokeFromAdobe[thisAdobeListName] = adobe.filterUsersToRevoke(thisLibCalEmails, thisAdobeList);
+
+      console.log('adobeList:', thisAdobeListName, thisAdobeList);
+      console.log('addToAdobe:', addToAdobe);
+      console.log('revokeFromAdobe:', revokeFromAdobe);
+
+      var jsonBody = [];
+
+      if (addToAdobe[thisAdobeListName].length > 0) {
+        jsonBody = jsonBody.concat(adobe.prepBulkAddFromLibCal2Adobe(addToAdobe[thisAdobeListName], thisAdobeListName));
+      }
+
+      if (revokeFromAdobe[thisAdobeListName].length > 0) {
+        console.debug('about to revoke', thisAdobeListName, 'for', revokeFromAdobe[thisAdobeListName])
+        jsonBody = jsonBody.concat(adobe.prepBulkRevokeFromAdobe(revokeFromAdobe[thisAdobeListName], thisAdobeListName));
+      }
+
+      if (jsonBody.length > 0) {
+        console.debug('Going to submit Json to Adobe:', typeof jsonBody, jsonBody);
+        response = await adobe.callSubmitJson(jsonBody);
+        console.log(response);
+      } else {
+        console.log('No update required; none submitted');
+      }
     });
-  }).catch((error) => {
-    console.error(error)
-  })
+  } catch (err) {
+    console.error('Cannot get Adobe list:', err);
+  }
+
+  // finally, log when the script finishes
+  console.log('Finished update at:', moment().format('YYYY-MM-DD HH:mm:ss'));
+  utils.Divider();
 }
+
