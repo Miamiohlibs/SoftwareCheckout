@@ -80,9 +80,10 @@ async function TheBusiness() {
 
     await async.eachOf(adobeGroups, async list => {
       let response = await adobe.callGroupUsers(list.adobeGroupName);
-      if (JSON.parse(response).hasOwnProperty('result')) {
-        console.log('Error reading Adobe group in:', list);
-        console.log('One or more needed values may not be set');
+      if (! JSON.parse(response).hasOwnProperty('result') || JSON.parse(response).result != 'success') {
+        console.error('Error reading Adobe group in:', list);
+        console.error('One or more needed values may not be set');
+        console.error('Raw response:', response);
       }
       // console.debug('list for:',list.adobeGroupName);
       adobeUserList[list.adobeGroupName] = adobe.getCurrentUsernames(JSON.parse(response));
