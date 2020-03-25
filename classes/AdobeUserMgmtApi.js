@@ -99,6 +99,21 @@ module.exports = class AdobeUserMgmtApi {
     return this.executeCurrQuery(body);
   }
 
+  getAdobeLists (listConfObj) {
+    // looks at the listConfObj
+    // returns results with {'provider':'Adobe'} and has a defined 'adobeGroupName' attribute
+    const allAdobeLists = listConfObj.filter(item => item.provider == 'Adobe');
+    const goodGroups = allAdobeLists.filter(item => item.hasOwnProperty('adobeGroupName'));
+    let errors = [];
+    allAdobeLists.map(item => {
+      if (! item.hasOwnProperty('adobeGroupName')) { 
+        errors.push('ERROR: This Adobe group is skipped because it lacks an adobeGroupName property:',item);
+      }
+    });
+    let returnObj = { groups: goodGroups };
+    if (errors.length > 0) { returnObj.errors= errors }
+    return returnObj;
+  }
   getCurrentUsernames(obj) {
     console.debug('input to getCurrentUsername:',obj);
     let users = obj.users;

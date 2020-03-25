@@ -1,4 +1,4 @@
-const sampleConf = require('./sample-data/adobeConfSample');
+const appConfMissingStuff = require('./sample-data/appConfSample');
 const realConf = require('../config/adobe');
 const AdobeUserMgmtApi = require('../classes/AdobeUserMgmtApi');
 const sampleGroupMembers = require('./sample-data/adobeGroupMembers');
@@ -20,6 +20,21 @@ describe('Initialization', () => {
     expect(typeof api.credentials.privateKey).toBe('string');
   });
 })
+
+describe('getAdobeLists', () => {
+  api = new AdobeUserMgmtApi(realConf);
+  it('should return only one object from the sample conf: Adobe Photoshop', () => {
+    const response = api.getAdobeLists(appConfMissingStuff.software);
+    expect(typeof response).toBe('object');
+    expect(response).toHaveProperty('groups');
+    expect(response).toHaveProperty('errors');
+    expect(response.groups).toBeInstanceOf(Array);
+    expect(response.groups.length).toBe(1);
+    expect(response.errors).toBeInstanceOf(Array);
+    expect(response.errors.length).toBe(2);
+    expect(response.groups[0]).toHaveProperty('name','Adobe Photoshop');
+  });
+});
 
 describe('Queries', () => {
   beforeEach(async () => {
