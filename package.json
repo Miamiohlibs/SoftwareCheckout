@@ -5,9 +5,9 @@
   "main": "app.js",
   "scripts": {
     "test": "jest --watch",
-    "start": "node app",
-    "server": "node app --listen --name=software-checkout >> logs/app.log 2>&1 &",
-    "dev": "nodemon app"
+    "start": "node hello",
+    "server": "node hello --listen --name=software-checkout >> logs/app.log 2>&1 &",
+    "dev": "nodemon hello"
   },
   "author": "Ken Irwin",
   "license": "MIT",
