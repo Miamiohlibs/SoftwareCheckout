@@ -7,3 +7,7 @@ certs/*
 config/adobe.js
 config/libCal.js 
 config/appConf.js 
+
+# older dev scripts no longer used
+setFakeData.sh 
+testPost.sh
