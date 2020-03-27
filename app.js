@@ -1,14 +1,14 @@
-// this is the OOP version of app.js, in progress
+const https = require('https');
+const fs = require('fs');
+const async = require('async');
+const express = require('express');
+const moment = require('moment');
 const LibCalApi = require('./classes/LibCalApi');
 const libCalConf = require('./config/libCal');
 const appConf = require('./config/appConf');
 const adobeConf = require('./config/adobe');
 const AdobeApi = require('./classes/AdobeUserMgmtApi');
-const async = require('async');
-const express = require('express');
-const moment = require('moment');
 const utils = require('./scripts/utils');
-const https = require('https');
 
 
 utils.Divider();
