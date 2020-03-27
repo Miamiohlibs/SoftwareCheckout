@@ -6,7 +6,7 @@ logs/
 certs/*
 config/adobe.js
 config/libCal.js 
-config/appConf.js 
+config/appConf.js
 
 # older configs
 config/campusIT.js
