@@ -4,7 +4,7 @@ module.exports = {
     name: 'server1.yourorg.edu', // REPLACE WITH server name
     key: '/path/to/your/ssl.key', // REPLACE WITH path to your server's SSL key
     cert: '/path/to/your/ssl.crt' // REPLACE WITH path to your server's SSL cert
-  }
+  },
   software: [
     {
       provider: 'Adobe', // 'Adobe' is currently the only supported value, but that could change in the future
