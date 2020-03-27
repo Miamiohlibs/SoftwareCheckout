@@ -10,13 +10,20 @@ const moment = require('moment');
 const utils = require('./scripts/utils');
 const https = require('https');
 
+
+utils.Divider();
+console.log('Starting SoftwareCheckout at:',moment().format('YYYY-MM-DD HH:mm:ss'));
+
 // uncomment this line to suppress debug messages
 console.debug = () => { };
 
 /* SERVER SETUP */
 // is this running on the server, or on another machine
 // (if on a webserver, we'll want an SSL certificate below)
-if (process.env.HOSTNAME === appConf.server.name) {
+if (! appConf.hasOwnProperty('server') || (! appConf.server.hasOwnProperty('name'))) {
+  global.onServer = false;
+}
+else if (process.env.HOSTNAME === appConf.server.name) {
   global.onServer = true;
 }
 else {
