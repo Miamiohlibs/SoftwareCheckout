@@ -21,12 +21,22 @@ Looks up software bookings from the LibCal API and updates the membership of cor
 
 ## App Configuration
 
+This repo comes with several `config/*.sample.js` files; copy each of them over to `config/*.js` e.g. `config/adobe.js` and update the values with local variables and API keys as indicated by the comments in the file.
+
+Request API keys from LibCal and Adobe. You will enter these values in the configs described below.
+
 * `config/appConf.js`:  
   * `nodePort`: the port this app will run on; default is 9000, but you may want to change that according to local needs.
   * `server`: if your setup inlucdes triggering the app to update using an https call, give your server's fully-qualified hostname, along with the paths to the SSL certificate and key. (See "Running the App" below.)
   * `software`: object descibing the connections between LibCal's names for the software and the related Adobe permissions groups
 * `config/libCal.js`: includes API key, config for requesting an API token, and query config for making API requests with the token.
+  * update the softwareLocation with the Location ID you created for Software Checkout in LibCal
+  * update the `client` values with the client ID and client_secret API keys you get from LibCal
+  * in the `auth` and `queryConfig` objects, enter the name of your libcal server (e.g. `miamioh.libcal.edu`) - include the `https://` only where indicated in the sample file
 * `config/adobe.js`: includes API credentials, route to private key, and query config
+  * the API credential are supplied when you request and API key from Adobe
+  * as part of the API setup, you will create a public and private key pair; upload the public key to Adobe and store the private key in the `certs/` folder as `private.key`
+  * the `queryConfig` does not need to be altered from `config/adobe.sample.js`
 
 ## Running the app
 

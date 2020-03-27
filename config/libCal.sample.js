@@ -8,10 +8,10 @@ module.exports = {
       idParamName: 'client_id'
     },
     auth: {
-      tokenHost: 'https://yourlib.libcal.com', // REPLACE WITH your libcal server
+      tokenHost: 'https://yourlib.libcal.com', // REPLACE WITH your libcal server (with https://)
       tokenPath: '/1.1/oauth/token',
       revokePath: '/1.1/oauth/revoke',
-      authorizeHost: 'https://yourlib.libcal.com', // REPLACE WITH your libcal server
+      authorizeHost: 'https://yourlib.libcal.com', // REPLACE WITH your libcal server (with https://)
       authorizePath: '/1.1/oauth/token'
     },
     http: {
@@ -26,12 +26,12 @@ module.exports = {
   },
   queryConfig: {
     options: {
-      hostname: 'yourlib.libcal.com', //your libcal server
+      hostname: 'yourlib.libcal.com', //your libcal server (without https://)
       port: 443, 
-      path: '', //set at query time
+      path: '', //set at query time, LEAVE BLANK
       method: 'GET',
       headers: {
-        // set at query time
+        // set at query time, LEAVE BLANK
       }
     },
   }
