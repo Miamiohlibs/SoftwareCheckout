@@ -8,6 +8,9 @@ config/adobe.js
 config/libCal.js 
 config/appConf.js 
 
+# older configs
+config/campusIT.js
 # older dev scripts no longer used
 setFakeData.sh 
 testPost.sh
+getToken.sh
