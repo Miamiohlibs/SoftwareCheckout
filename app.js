@@ -8,20 +8,54 @@ const async = require('async');
 const express = require('express');
 const moment = require('moment');
 const utils = require('./scripts/utils');
+const https = require('https');
 
 // uncomment this line to suppress debug messages
 console.debug = () => { };
 
+/* SERVER SETUP */
+// is this running on the server, or on another machine
+// (if on a webserver, we'll want an SSL certificate below)
+if (process.env.HOSTNAME === appConf.server.name) {
+  global.onServer = true;
+}
+else {
+  global.onServer = false;
+}
+console.log(`On Server? : ${global.onServer}`)
+
+// parse command line args; if --listen, start express server
 const myArgs = process.argv.slice(2);
 if (myArgs.includes('--listen')) {
   const app = express();
-  const port = appConf.nodePort || 9000;
+  const PORT = appConf.nodePort || 9000;
+
+  if (global.onServer === true) {
+    const server = {
+      key: '/etc/ssl/certs/ulblwebt03.lib.miamioh.edu.key',
+      cert: '/etc/ssl/certs/ulblwebt03.lib.miamioh.edu.crt'
+    }
+
+    https.createServer({
+      key: fs.readFileSync(appConf.server.key),
+      cert: fs.readFileSync(appConf.server.cert)
+    }, app)
+      .listen(PORT, function () {
+        console.log(`SoftwareCheckout app listening on port ${PORT}! Go to https://${process.env.HOSTNAME}:${PORT}/`)
+      })
+  } else { // if not on server, just serve without ssl 
+    app.listen(PORT, function () {
+      console.log(`SoftwareCheckout app listening on port ${PORT}! Go to https://localhost:${PORT}/`)
+    })
+  }
+  // listen for requests
   app.get('/', (req, res) => {
     TheBusiness();
     res.send('Updating permissions groups at: ' + moment().format('YYYY-MM-DD HH:mm:ss'));
   });
-  app.listen(port, () => console.log(`SoftwareCheckout app listening on port ${port}!`));
-}
+} 
+/* END SERVER SETUP */
+
 
 // on startup, run TheBusiness once, then wait for subsequent Express requests
 TheBusiness();
@@ -76,7 +110,7 @@ async function TheBusiness() {
     const adobeGroupsData = adobe.getAdobeLists(appConf.software);
     const adobeGroups = adobeGroupsData.groups;
     if (adobeGroupsData.hasOwnProperty('errors')) {
-      console.error('Errors in appConf.js:',adobeGroupsData.errors);
+      console.error('Errors in appConf.js:', adobeGroupsData.errors);
     }
 
     // foreach adobe list, get members and compare against libcal list
@@ -84,7 +118,7 @@ async function TheBusiness() {
     // add any members not in the adobe list
     await async.eachOf(adobeGroups, async list => {
       let response = await adobe.callGroupUsers(list.adobeGroupName);
-      if (! JSON.parse(response).hasOwnProperty('result') || JSON.parse(response).result != 'success') {
+      if (!JSON.parse(response).hasOwnProperty('result') || JSON.parse(response).result != 'success') {
         console.error('Error reading Adobe group in:', list);
         console.error('One or more needed values may not be set');
         console.error('Raw response:', response);
