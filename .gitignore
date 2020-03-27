@@ -5,7 +5,7 @@ package-lock.json
 logs/
 certs/*
 config/adobe.js
-config/libCal.js 
+config/libCal.js
 config/appConf.js
 
 # older configs
