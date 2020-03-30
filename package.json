@@ -22,10 +22,10 @@
     "simple-oauth2": "^3.3.0"
   },
   "devDependencies": {
-    "babel-jest": "^25.1.0",
+    "babel-jest": "^25.2.4",
     "bufferutil": "^4.0.1",
     "canvas": "^2.6.1",
-    "jest": "^25.1.0",
+    "jest": "^25.2.4",
     "utf-8-validate": "^5.0.2"
   }
 }
