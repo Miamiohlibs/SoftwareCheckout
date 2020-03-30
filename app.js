@@ -69,6 +69,7 @@ TheBusiness();
 
 async function TheBusiness() {
   utils.Divider();
+  console.log('Starting update at:',moment().format('YYYY-MM-DD HH:mm:ss'));
 
   // Get LibCal Token
   try {
