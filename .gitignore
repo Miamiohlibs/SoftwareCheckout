@@ -8,9 +8,9 @@ certs/*
 config/adobe.js
 config/libCal.js
 config/appConf.js
+config/campusConf.js
 
 # older configs
-config/campusIT.js
 # older dev scripts no longer used
 setFakeData.sh 
 testPost.sh
