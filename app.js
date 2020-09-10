@@ -1,4 +1,5 @@
 const https = require('https');
+const util = require('util');
 const fs = require('fs');
 const async = require('async');
 const express = require('express');
@@ -8,7 +9,10 @@ const libCalConf = require('./config/libCal');
 const appConf = require('./config/appConf');
 const adobeConf = require('./config/adobe');
 const AdobeApi = require('./classes/AdobeUserMgmtApi');
+const CampusApi = require('./classes/CampusApi');
+const campusConf = require('./config/campusConf');
 const utils = require('./scripts/utils');
+let campus = new CampusApi(campusConf);
 
 utils.Divider();
 console.log(
@@ -17,7 +21,8 @@ console.log(
 );
 
 // uncomment this line to suppress debug messages
-console.debug = () => {};
+// comment-out the line to get more logs
+// console.debug = () => {};
 
 /* SERVER SETUP */
 // is this running on the server, or on another machine
@@ -162,6 +167,7 @@ async function TheBusiness() {
       }
       var thisLibCalEmails = lcApi.getEmailsFromBookings(thisLibCalList);
       var thisAdobeList = adobeUserList[thisAdobeListName];
+      thisAdobeList = campus.convertMultipleEmails(thisAdobeList); //convert aliases
       console.log(thisLibCalListName, '(libcal):', thisLibCalList.length);
       console.log(thisAdobeListName, '(adobe)', thisAdobeList.length);
 
@@ -181,12 +187,14 @@ async function TheBusiness() {
       var jsonBody = [];
 
       if (addToAdobe[thisAdobeListName].length > 0) {
+        console.log('Adding to jsonBody to prepare to add to Adobe');
         jsonBody = jsonBody.concat(
           adobe.prepBulkAddFromLibCal2Adobe(
             addToAdobe[thisAdobeListName],
             thisAdobeListName
           )
         );
+        console.log('jsonBody:', util.inspect(jsonBody, false, null, false));
       }
 
       if (revokeFromAdobe[thisAdobeListName].length > 0) {
@@ -208,7 +216,7 @@ async function TheBusiness() {
         console.debug(
           'Going to submit Json to Adobe:',
           typeof jsonBody,
-          jsonBody
+          util.inspect(jsonBody, false, null, false)
         );
         response = await adobe.callSubmitJson(jsonBody);
         console.log(response);
