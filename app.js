@@ -74,7 +74,14 @@ if (myArgs.includes('--listen')) {
   }
   // listen for requests
   app.get('/', (req, res) => {
-    TheBusiness();
+    TheBusiness().then((done) => {
+      // finally, log when the script finishes
+      console.log(
+        'Finished update at:',
+        moment().format('YYYY-MM-DD HH:mm:ss')
+      );
+      utils.Divider();
+    });
     res.send(
       'Updating permissions groups at: ' +
         moment().format('YYYY-MM-DD HH:mm:ss')
@@ -84,7 +91,11 @@ if (myArgs.includes('--listen')) {
 /* END SERVER SETUP */
 
 // on startup, run TheBusiness once, then wait for subsequent Express requests
-TheBusiness();
+TheBusiness().then((done) => {
+  // finally, log when the script finishes
+  console.log('Finished update at:', moment().format('YYYY-MM-DD HH:mm:ss'));
+  utils.Divider();
+});
 
 async function TheBusiness() {
   utils.Divider();
@@ -118,6 +129,16 @@ async function TheBusiness() {
     await async.eachOf(lcSoftware, async (software) => {
       if (software.bookings.length > 0) {
         let lcBookings = lcApi.getCurrentLibCalBookings(software.bookings);
+        await campus.asyncForEach(lcBookings, async (input) => {
+          // console.log('TRYING TO CONVERT EMAILS: ', lcUserList.length);
+          let updated = await campus.convertEmailToUniq(input.email);
+          if (updated != undefined) {
+            // console.log('CONVERT: ', input.email, 'TO:', updated);
+            if (!updated.includes(campusConf.emailDomain)) {
+              input.email = updated + campusConf.emailDomain;
+            }
+          }
+        });
         console.debug('LibCal bookings:', software.shortName, lcBookings);
         lcUserList[software.shortName] = lcBookings;
       }
@@ -165,11 +186,28 @@ async function TheBusiness() {
       if (typeof thisLibCalList == 'undefined') {
         thisLibCalList = []; // prevetns error in next line
       }
+      if (typeof thisAdobeList == 'undefined') {
+        thisAdobeList = [];
+      }
       var thisLibCalEmails = lcApi.getEmailsFromBookings(thisLibCalList);
+      // console.log('Before:', thisLibCalEmails);
+      // thisLibCalEmails = await campus.convertMultipleEmails(thisLibCalEmails);
+      // console.log('After:', thisLibCalEmails);
       var thisAdobeList = adobeUserList[thisAdobeListName];
-      thisAdobeList = campus.convertMultipleEmails(thisAdobeList); //convert aliases
+      console.log('Pair of lists: ', thisLibCalListName, thisAdobeListName);
       console.log(thisLibCalListName, '(libcal):', thisLibCalList.length);
-      console.log(thisAdobeListName, '(adobe)', thisAdobeList.length);
+      console.log(thisAdobeListName, '(adobe):', thisAdobeList.length);
+
+      // await campus.asyncForEach(thisAdobeList, async (input) => {
+      //   console.log('TRYING TO CONVERT EMAILS: ', thisAdobeList.length);
+      //   let updated = await campus.convertEmailToUniq(input.email);
+      //   if (updated != undefined) {
+      //     console.log('CONVERT: ', input.email, 'TO:', updated);
+      //     if (!updated.includes(campusConf.emailDomain)) {
+      //       input.email = updated + campusConf.emailDomain;
+      //     }
+      //   }
+      // });
 
       addToAdobe[thisAdobeListName] = adobe.filterBookingsToAdd(
         thisLibCalList,
@@ -218,8 +256,12 @@ async function TheBusiness() {
           typeof jsonBody,
           util.inspect(jsonBody, false, null, false)
         );
-        response = await adobe.callSubmitJson(jsonBody);
-        console.log(response);
+        if (appConf.testMode == true) {
+          console.log('TEST MODE: Update not submitted to Adobe');
+        } else {
+          response = await adobe.callSubmitJson(jsonBody);
+          console.log(response);
+        }
       } else {
         console.log('No update required; none submitted');
       }
@@ -227,8 +269,5 @@ async function TheBusiness() {
   } catch (err) {
     console.error('Cannot get Adobe list:', err);
   }
-
-  // finally, log when the script finishes
-  console.log('Finished update at:', moment().format('YYYY-MM-DD HH:mm:ss'));
-  utils.Divider();
+  return;
 }
