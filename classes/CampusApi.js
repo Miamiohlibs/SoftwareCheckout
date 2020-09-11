@@ -14,7 +14,7 @@ module.exports = class CampusApi {
   }
 
   async convertEmailToUniq(email) {
-    if (!email.includes('@')) {
+    if (email != undefined && !email.includes('@')) {
       email += this.conf.emailDomain;
     }
     const escapedEmail = encodeURIComponent(email);
