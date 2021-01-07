@@ -9,6 +9,7 @@ const appConf = require('./config/appConf');
 const adobeConf = require('./config/adobe');
 const AdobeApi = require('./classes/AdobeUserMgmtApi');
 const utils = require('./scripts/utils');
+const util = require('util');
 
 utils.Divider();
 console.log(
@@ -17,7 +18,7 @@ console.log(
 );
 
 // uncomment this line to suppress debug messages
-console.debug = () => {};
+// console.debug = () => {};
 
 /* SERVER SETUP */
 // is this running on the server, or on another machine
@@ -187,10 +188,11 @@ async function TheBusiness() {
             thisAdobeListName
           )
         );
+        console.log('prepped a jsonBody to add to Adobe');
       }
 
       if (revokeFromAdobe[thisAdobeListName].length > 0) {
-        console.debug(
+        console.log(
           'about to revoke',
           thisAdobeListName,
           'for',
@@ -202,15 +204,18 @@ async function TheBusiness() {
             thisAdobeListName
           )
         );
+        console.log('prepped a jsonBody to revoke from Adobe');
       }
 
+      // console.log('jsonBody:', util.inspect(jsonBody, {showHidden: false, depth: null}));
+
       if (jsonBody.length > 0) {
-        console.debug(
+        console.log(
           'Going to submit Json to Adobe:',
           typeof jsonBody,
-          jsonBody
+          JSON.stringify(jsonBody)
         );
-        response = await adobe.callSubmitJson(jsonBody);
+        response = await adobe.callSubmitJson(JSON.stringify(jsonBody));
         console.log(response);
       } else {
         console.log('No update required; none submitted');
