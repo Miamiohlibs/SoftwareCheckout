@@ -138,13 +138,13 @@ module.exports = class AdobeUserMgmtApi {
 
   createAddJsonBody(user, country, firstName, lastName, groups, n=1) {
     let doObj = [{
-      'createFederatedID': {
-        email: user,
-        country: country,
-        firstname: firstName,
-        lastname: lastName,
-        option: 'ignoreIfAlreadyExists'
-      },
+//      'createFederatedID': {
+//        email: user,
+//        country: country,
+//        firstname: firstName,
+//        lastname: lastName,
+//        option: 'ignoreIfAlreadyExists'
+//      },
       'add': {
         group: groups
       }
@@ -176,6 +176,7 @@ module.exports = class AdobeUserMgmtApi {
     let jsonBody = [];
     userList.forEach(item => {
       jsonBody.push(this.createRevokeJsonBody(item, [listName], i));
+      i++;
     });
     return jsonBody;
   }
