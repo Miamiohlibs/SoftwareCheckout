@@ -99,7 +99,9 @@ module.exports = class LibCalApi {
       return ((Date.now() > fromDate) && (Date.now() < toDate))
     });
     // limit to confirmed bookings (not cancelled, etc)
-    return currentBookings.filter(obj => { return obj.status === 'Confirmed' });
+    return currentBookings.filter((obj) => {
+      return obj.status === 'Confirmed' || obj.status === 'Mediated Approved';
+    });
   }
 
   getEmailsFromBookings(bookings) {
