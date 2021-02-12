@@ -9,6 +9,7 @@ const appConf = require('./config/appConf');
 const adobeConf = require('./config/adobe');
 const AdobeApi = require('./classes/AdobeUserMgmtApi');
 const utils = require('./scripts/utils');
+const util = require('util');
 
 utils.Divider();
 console.log(
@@ -187,6 +188,10 @@ async function TheBusiness() {
             thisAdobeListName
           )
         );
+        console.log('========');
+        console.log('addToAdobe:');
+        console.log(util.inspect(jsonBody, { showHidden: false, depth: null }));
+        console.log('========');
       }
 
       if (revokeFromAdobe[thisAdobeListName].length > 0) {
@@ -202,6 +207,10 @@ async function TheBusiness() {
             thisAdobeListName
           )
         );
+        console.log('========');
+        console.log('revokeFromAdobe:');
+        console.log(util.inspect(jsonBody, { showHidden: false, depth: null }));
+        console.log('========');
       }
 
       if (jsonBody.length > 0) {
