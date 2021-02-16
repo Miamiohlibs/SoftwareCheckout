@@ -203,21 +203,35 @@ async function TheBusiness() {
             thisAdobeListName
           )
         );
-        console.log('========');
-        console.log('addAndRevokeFromAdobe:');
-        // console.log(util.inspect(jsonBody, { showHidden: false, depth: null }));
-        console.log(JSON.stringify(jsonBody));
-        console.log('========');
       }
 
       if (jsonBody.length > 0) {
-        console.debug(
-          'Going to submit Json to Adobe:',
-          typeof jsonBody,
-          jsonBody
+        // create array for possible multiple Adobe update calls
+        let adobeUpdates = [];
+        // divide jsonBody into arrays of no more than 10 actions
+        var i,
+          j,
+          temparray,
+          chunk = 10;
+        for (i = 0, j = jsonBody.length; i < j; i += chunk) {
+          temparray = jsonBody.slice(i, i + chunk);
+          adobeUpdates.push(temparray);
+        }
+
+        console.log(
+          'Adobe updates broken in to # pieces:',
+          adobeUpdates.length
         );
-        response = await adobe.callSubmitJson(jsonBody);
-        console.log(response);
+
+        adobeUpdates.forEach(async (adobeChunk) => {
+          console.debug(
+            'Going to submit Json to Adobe:',
+            typeof adobeChunk,
+            adobeChunk
+          );
+          response = await adobe.callSubmitJson(adobeChunk);
+          console.log(response);
+        });
       } else {
         console.log('No update required; none submitted');
       }
