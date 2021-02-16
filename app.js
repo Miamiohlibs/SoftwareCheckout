@@ -188,10 +188,6 @@ async function TheBusiness() {
             thisAdobeListName
           )
         );
-        console.log('========');
-        console.log('addToAdobe:');
-        console.log(util.inspect(jsonBody, { showHidden: false, depth: null }));
-        console.log('========');
       }
 
       if (revokeFromAdobe[thisAdobeListName].length > 0) {
@@ -208,8 +204,9 @@ async function TheBusiness() {
           )
         );
         console.log('========');
-        console.log('revokeFromAdobe:');
-        console.log(util.inspect(jsonBody, { showHidden: false, depth: null }));
+        console.log('addAndRevokeFromAdobe:');
+        // console.log(util.inspect(jsonBody, { showHidden: false, depth: null }));
+        console.log(JSON.stringify(jsonBody));
         console.log('========');
       }
 
