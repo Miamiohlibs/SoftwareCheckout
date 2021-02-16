@@ -111,8 +111,11 @@ module.exports = class AdobeUserMgmtApi {
     return this.executeCurrQuery();
   }
 
-  async callSubmitJson(body) {
+  async callSubmitJson(body, testOnly = false) {
     let path = await this.getActionPath('action');
+    if (testOnly) {
+      path += 'testOnly=true';
+    }
     this.querySetup('generic', {
       method: 'POST',
       path: path,
