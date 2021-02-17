@@ -1,13 +1,13 @@
 const Query = require('./Query');
 
 // uncomment this line to suppress debug messages
-console.debug = ()=>{};
+console.debug = () => {};
 
 module.exports = class LibCalApi {
   constructor(conf) {
     this.conf = conf;
     const required = ['credentials', 'queryConfig'];
-    required.forEach(element => {
+    required.forEach((element) => {
       if (!this.conf.hasOwnProperty(element)) {
         throw new Error('LibCalApi missing required property: ' + element);
       }
@@ -32,22 +32,29 @@ module.exports = class LibCalApi {
   async getOneLibCalList(element, params = '') {
     const libCalOptions = this.conf;
 
-    // only get location: library software 
-    if (element == 'categories') { var id = '/' + this.conf.softwareLocation } else { id = '' }
+    // only get location: library software
+    if (element == 'categories') {
+      var id = '/' + this.conf.softwareLocation;
+    } else {
+      id = '';
+    }
 
     this.conf.queryConfig.options.path = '/1.1/equipment/' + element + id;
-    this.conf.queryConfig.options.headers = { Authorization: 'Bearer ' + this.token }
+    this.conf.queryConfig.options.headers = {
+      Authorization: 'Bearer ' + this.token,
+    };
     if (element == 'bookings') {
-      this.conf.queryConfig.options.path += '?limit=100&lid=' + this.conf.softwareLocation + params;
+      this.conf.queryConfig.options.path +=
+        '?limit=100&lid=' + this.conf.softwareLocation + params;
     }
-    console.debug(this.conf.queryConfig.options.path, this.token)
+    console.debug(this.conf.queryConfig.options.path, this.token);
     // get a promise for each call
     try {
       let query = new Query(this.conf.queryConfig);
       let response = await query.execute();
       return response;
     } catch {
-      console.error('failed to get libcal query')
+      console.error('failed to get libcal query');
     }
   }
 
@@ -55,16 +62,19 @@ module.exports = class LibCalApi {
     try {
       let categories = await this.getOneLibCalList('categories');
       let cats = JSON.parse(categories);
-      console.log()
+      console.log();
       const allLists = [];
-      await this.asyncForEach(cats[0].categories, async item => {
+      await this.asyncForEach(cats[0].categories, async (item) => {
         // console.log(item);
-        let response = await this.getOneLibCalList('bookings', "&cid=" + item.cid);
+        let response = await this.getOneLibCalList(
+          'bookings',
+          '&cid=' + item.cid
+        );
         let parsed = JSON.parse(response);
-        let obj = { cid: item.cid, name: item.name, bookings: parsed } //, categories: categories }
+        let obj = { cid: item.cid, name: item.name, bookings: parsed }; //, categories: categories }
         // console.log('ID:',item.cid)
         // response[item.cid] = obj;
-        allLists.push(obj)
+        allLists.push(obj);
       });
       // this.lcSoftware = allLists;
       return allLists;
@@ -75,14 +85,14 @@ module.exports = class LibCalApi {
 
   mapLibCal2ShortName(cids, crosswalk) {
     // adds a .campusCode property to each LibCal cid element
-    // note: the LibCal.name must exactly match the .name property defined in configs/campusIT.js
-    // crosswalk should be the .software property of the campusIt configuration, containing a name and shortName
-    cids.forEach(libCalElement => {
-      crosswalk.map(item => {
+    // note: the LibCal.name must exactly match the software[] object.name property defined in configs/appConf
+    // crosswalk should be the .software property of the appConf configuration, containing a name and shortName
+    cids.forEach((libCalElement) => {
+      crosswalk.map((item) => {
         if (libCalElement.name == item.name) {
           libCalElement.shortName = item.shortName;
         }
-      })
+      });
     });
     return cids;
   }
@@ -91,12 +101,11 @@ module.exports = class LibCalApi {
     // checks the software array for bookings that are current (active as of now) and status=confirmed
     // returns an array with a subset of booked software
 
-
-    // filter to current 
-    let currentBookings = bookings.filter(obj => {
+    // filter to current
+    let currentBookings = bookings.filter((obj) => {
       let toDate = Date.parse(obj.toDate);
       let fromDate = Date.parse(obj.fromDate);
-      return ((Date.now() > fromDate) && (Date.now() < toDate))
+      return Date.now() > fromDate && Date.now() < toDate;
     });
     // limit to confirmed bookings (not cancelled, etc)
     return currentBookings.filter((obj) => {
@@ -105,16 +114,17 @@ module.exports = class LibCalApi {
   }
 
   getEmailsFromBookings(bookings) {
-    return bookings.map(item => { return item.email });
+    return bookings.map((item) => {
+      return item.email;
+    });
   }
 
   async asyncForEach(array, callback) {
-    // asyncForEach 
+    // asyncForEach
     // from: https://codeburst.io/javascript-async-await-with-foreach-b6ba62bbf404
     // by: Sebastien Chopin
     for (let index = 0; index < array.length; index++) {
       await callback(array[index], index, array);
     }
   }
-}
-
+};
