@@ -19,6 +19,10 @@ Looks up software bookings from the LibCal API and updates the membership of cor
 
 ### Adobe Setup
 
+1. Using the [Adobe I/O Console](https://console.adobe.io/), create a new Project with an associated Service Account (JWT).
+2. Put the `private.key` file from the certificate in the `certs/` folder of this project. BEWARE: certs expire after a year; you'll want to set a reminder to renew them before they expire
+3. Copy `config/adobe.sample.js` to `config/adobe.js` and add the Project details to that file (clientId, clientSecret,orgId,technicalAccountId)
+
 ## App Configuration
 
 This repo comes with several `config/*.sample.js` files; copy each of them over to `config/*.js` e.g. `config/adobe.js` and update the values with local variables and API keys as indicated by the comments in the file.
